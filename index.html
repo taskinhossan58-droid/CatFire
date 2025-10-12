@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Fire - Earn Money</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Earn Money</title>
     
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+     Firebase SDK 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- Monetag SDK removed - only manual reward ads will be shown -->
-    <!-- <script src='//libtl.com/sdk.js' data-zone='9937367' data-sdk='show_9937367'></script> -->
+     Keeping Monetag SDK for reward ads only 
+     Monetag SDK 
+    <script src='//libtl.com/sdk.js' data-zone='9937367' data-sdk='show_9937367'></script>
     
     <style>
         * {
@@ -1132,10 +1131,7 @@
                     </button>
                 </div>
 
-                <!-- Telegram Tasks (Max 3 per day) -->
-                <div id="telegramTasksContainer"></div>
-
-                 Daily Login Bonus 
+                <!-- Daily Login Bonus -->
                 <div class="task-card">
                     <div class="task-header">
                         <div class="task-title">🎁 Daily Login Bonus</div>
@@ -1348,11 +1344,8 @@
         </div>
     </div>
     
-    <!-- Banner Ad Container -->
-    <!-- Banner ads disabled as per user request -->
-    <!-- <div id="banner-ad-container" style="position: fixed; bottom: 70px; width: 100%; height: 70px; display: flex; justify-content: center; align-items: center; z-index: 1001;"> -->
-        <!-- Banner ad will be loaded here by Monetag SDK -->
-    <!-- </div> -->
+     Removed banner ad container 
+    
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
@@ -1467,9 +1460,8 @@
                 updateUI();
                 // initSpinWheel();
                 
-                // initializeMonetagAds(); // Removed: Monetag Ads Initialization function
                 
-                // setInterval(showInterstitialAd, 60000); // Removed: Interstitial ads are disabled
+                // setInterval(showInterstitialAd, 60000);
 
                 document.getElementById('loadingScreen').classList.add('hidden');
             } catch (error) {
@@ -1479,9 +1471,8 @@
             }
         }
 
-        // Monetag Ads Initialization - Removed function
-        // function initializeMonetagAds() { ... }
-        
+        // Monetag Ads Initialization
+
         // Authenticate User
         async function authenticateUser(telegramUser) {
             const userId = telegramUser.id.toString();
@@ -1527,9 +1518,9 @@
                     monetag: { count: 0, lastReset: new Date().toDateString() },
                     directLink: { count: 0, lastReset: new Date().toDateString() },
                     youtube: { count: 0, lastReset: new Date().toDateString() },
-                    telegram: { count: 0, lastReset: new Date().toDateString(), completedTasks: [] },
                     loginBonus: { claimed: false, lastClaim: null },
                     spin: { count: 0, lastReset: new Date().toDateString() },
+                    interstitial: { count: 0, lastReset: new Date().toDateString() }
                 },
                 oneTimeTasks: {
                     telegram: false,
@@ -1697,7 +1688,6 @@
                         loginBonusReward: 0.20, 
                         telegramBonusReward: 0.50, 
                         telegramChannelLink: '', 
-                        telegramTasks: [],
                         youtubeSubBonusReward: 0.50, 
                         youtubeChannelLink: '', 
                         paymentMethods: ['PayPal', 'Payoneer'], 
@@ -1740,12 +1730,12 @@
                     dailyTasks.youtube = { count: 0, lastReset: today }; 
                     needsUpdate = true; 
                 }
-                if (!dailyTasks.telegram || dailyTasks.telegram.lastReset !== today) { 
-                    dailyTasks.telegram = { count: 0, lastReset: today, completedTasks: [] }; 
-                    needsUpdate = true; 
-                }
                 if (dailyTasks.spin.lastReset !== today) { 
                     dailyTasks.spin = { count: 0, lastReset: today }; 
+                    needsUpdate = true; 
+                }
+                if (!dailyTasks.interstitial || dailyTasks.interstitial.lastReset !== today) { 
+                    dailyTasks.interstitial = { count: 0, lastReset: today }; 
                     needsUpdate = true; 
                 }
                 
@@ -1814,8 +1804,6 @@
             loadTopWithdrawers();
             drawEarningsChart();
             drawReferralChart();
-
-            updateTelegramTasks();
         }
 
         function updateTaskProgress() {
@@ -1854,136 +1842,6 @@
                 loginBonusBtn.classList.replace('active', 'completed');
                 loginBonusBtn.textContent = 'Claimed';
                 loginBonusBtn.disabled = true;
-            }
-        }
-
-        function updateTelegramTasks() {
-            const container = document.getElementById('telegramTasksContainer');
-            container.innerHTML = '';
-
-            if (!adminSettings.telegramTasks || adminSettings.telegramTasks.length === 0) {
-                return; // No telegram tasks to display
-            }
-
-            adminSettings.telegramTasks.forEach((task, index) => {
-                const taskId = `telegram-task-${index}`;
-                const isCompleted = userData.dailyTasks.telegram.completedTasks.includes(index);
-                const currentStep = getCurrentTelegramTaskStep(index);
-
-                const taskCard = document.createElement('div');
-                taskCard.className = 'task-card';
-                taskCard.innerHTML = `
-                    <div class="task-header">
-                        <div class="task-title">📱 ${task.description}</div>
-                        <div class="task-reward">$${task.reward.toFixed(2)}</div>
-                    </div>
-                    <div class="task-description">
-                        Complete 3 steps to earn reward
-                    </div>
-                    <div class="task-progress">
-                        <span>Step Progress</span>
-                        <span>${currentStep}/3</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(currentStep / 3) * 100}%"></div>
-                    </div>
-                    <button class="task-btn ${isCompleted ? 'completed' : 'active'}" 
-                            id="${taskId}-btn" 
-                            onclick="startTelegramTask(${index})"
-                            ${isCompleted ? 'disabled' : ''}>
-                        ${isCompleted ? 'Completed' : currentStep === 0 ? 'Start Task' : `Continue (Step ${currentStep + 1})`}
-                    </button>
-                `;
-                container.appendChild(taskCard);
-            });
-        }
-
-        function getCurrentTelegramTaskStep(taskIndex) {
-            // Initialize taskProgress if it doesn't exist
-            if (!userData.dailyTasks.telegram.taskProgress) {
-                userData.dailyTasks.telegram.taskProgress = {};
-            }
-            return userData.dailyTasks.telegram.taskProgress[taskIndex] || 0;
-        }
-
-        async function startTelegramTask(taskIndex) {
-            const task = adminSettings.telegramTasks[taskIndex];
-            if (!task) return;
-
-            const isCompleted = userData.dailyTasks.telegram.completedTasks.includes(taskIndex);
-            if (isCompleted) {
-                showNotification('Task already completed', 'warning');
-                return;
-            }
-
-            const currentStep = getCurrentTelegramTaskStep(taskIndex);
-            
-            if (currentStep >= 3) {
-                showNotification('All steps completed', 'success');
-                return;
-            }
-
-            const modal = document.getElementById('taskModal');
-            document.getElementById('modalTitle').textContent = `${task.description} - Step ${currentStep + 1}/3`;
-            document.getElementById('modalText').textContent = 'Open the Telegram link, then enter the verification code';
-            document.getElementById('modalContent').innerHTML = `
-                <button class="btn btn-primary" onclick="window.open('${task.url}', '_blank')" style="width: 100%; margin-bottom: 15px;">
-                    📱 Open Telegram Link
-                </button>
-                <div class="code-input-group">
-                    <input type="text" class="form-input code-input" id="telegramTaskCode" placeholder="Enter verification code">
-                </div>
-            `;
-            document.getElementById('modalActionBtn').textContent = 'Verify Code';
-            document.getElementById('modalActionBtn').onclick = () => verifyTelegramTaskCode(taskIndex, task.code, task.reward, currentStep);
-            modal.classList.add('active');
-        }
-
-        async function verifyTelegramTaskCode(taskIndex, correctCode, reward, currentStep) {
-            const enteredCode = document.getElementById('telegramTaskCode').value.trim();
-            
-            if (enteredCode.toLowerCase() === correctCode.toLowerCase()) {
-                const newStep = currentStep + 1;
-                
-                // Initialize taskProgress if it doesn't exist
-                if (!userData.dailyTasks.telegram.taskProgress) {
-                    userData.dailyTasks.telegram.taskProgress = {};
-                }
-                
-                userData.dailyTasks.telegram.taskProgress[taskIndex] = newStep;
-
-                // If all 3 steps completed, mark task as completed and give reward
-                if (newStep >= 3) {
-                    if (!userData.dailyTasks.telegram.completedTasks) {
-                        userData.dailyTasks.telegram.completedTasks = [];
-                    }
-                    userData.dailyTasks.telegram.completedTasks.push(taskIndex);
-
-                    await db.collection('users').doc(userData.telegramId).update({
-                        balance: firebase.firestore.FieldValue.increment(reward),
-                        taskEarnings: firebase.firestore.FieldValue.increment(reward),
-                        'dailyTasks.telegram.count': firebase.firestore.FieldValue.increment(1),
-                        'dailyTasks.telegram.completedTasks': userData.dailyTasks.telegram.completedTasks,
-                        'dailyTasks.telegram.taskProgress': userData.dailyTasks.telegram.taskProgress
-                    });
-
-                    await loadUserData();
-                    updateUI();
-                    closeModal();
-                    showNotification(`Task completed! $${reward.toFixed(2)} added!`, 'success');
-                } else {
-                    // Update progress for next step
-                    await db.collection('users').doc(userData.telegramId).update({
-                        'dailyTasks.telegram.taskProgress': userData.dailyTasks.telegram.taskProgress
-                    });
-
-                    await loadUserData();
-                    updateUI();
-                    closeModal();
-                    showNotification(`Step ${newStep}/3 completed! Continue to next step.`, 'success');
-                }
-            } else {
-                showNotification('Incorrect code', 'error');
             }
         }
 
@@ -2112,30 +1970,42 @@
             monetagBtn.disabled = true;
             monetagBtn.textContent = 'Loading...';
             
-            // In production, integrate with your ad network's reward ad API
-            showNotification('Watching ad... Please wait 30 seconds', 'warning');
-            
-            setTimeout(async () => {
-                const reward = adminSettings.monetagReward;
-                
-                await db.collection('users').doc(userData.telegramId).update({
-                    balance: firebase.firestore.FieldValue.increment(reward),
-                    taskEarnings: firebase.firestore.FieldValue.increment(reward),
-                    'dailyTasks.monetag.count': firebase.firestore.FieldValue.increment(1)
-                });
+            try {
+                if (typeof show_9937367 !== 'undefined') {
+                    show_9937367();
+                    
+                    // Wait for ad to complete
+                    setTimeout(async () => {
+                        const reward = adminSettings.monetagReward;
+                        
+                        await db.collection('users').doc(userData.telegramId).update({
+                            balance: firebase.firestore.FieldValue.increment(reward),
+                            taskEarnings: firebase.firestore.FieldValue.increment(reward),
+                            'dailyTasks.monetag.count': firebase.firestore.FieldValue.increment(1)
+                        });
 
-                await loadUserData();
-                updateUI();
+                        await loadUserData();
+                        updateUI();
 
-                showNotification(`$${reward.toFixed(2)} added!`, 'success');
+                        showNotification(`$${reward.toFixed(2)} added!`, 'success');
+                        monetagBtn.disabled = false;
+                        monetagBtn.textContent = 'Watch Ad';
+                    }, 30000); // Assume ad takes 30 seconds
+                } else {
+                    showNotification('Error loading ad', 'error');
+                    monetagBtn.disabled = false;
+                    monetagBtn.textContent = 'Watch Ad';
+                }
+            } catch (error) {
+                console.error('[v0] Error showing Monetag ad:', error);
+                showNotification('Error showing ad', 'error');
                 monetagBtn.disabled = false;
                 monetagBtn.textContent = 'Watch Ad';
-            }, 30000); // 30 seconds ad duration
+            }
         }
         
-        // All automatic ad displays have been removed per user request
-        // async function showInterstitialAd() { ... }
-
+        // Show Interstitial Ad
+        
         // Spin Wheel Functions
         function initSpinWheel() {
             const canvas = document.getElementById('wheelCanvas');
@@ -2277,8 +2147,7 @@
                     taskEarnings: firebase.firestore.FieldValue.increment(reward),
                     'dailyTasks.youtube.count': firebase.firestore.FieldValue.increment(1)
                 });
-                await loadUserData(); updateUI();
-                closeModal();
+                await loadUserData(); updateUI(); closeModal();
                 showNotification(`$${reward.toFixed(2)} added!`, 'success');
             } else {
                 showNotification('Incorrect code', 'error');
@@ -2437,11 +2306,65 @@
             closeModal();
         }
 
-        // Initialize on load
-        window.addEventListener('load', async () => {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            await initApp();
+        // Initialize app on load
+        // Modified initialization to use DOMContentLoaded and a new initializeFirebase function
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('[v0] DOM Content Loaded');
+            
+            // Initialize Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                console.log('[v0] Telegram WebApp initialized');
+            }
+
+            // Initialize Firebase
+            initializeFirebase();
+            
+            // VPN Detection (moved from initApp)
+            const hasVPN = await detectVPN();
+            if (hasVPN) {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                return;
+            }
+            
+            
+            // Load user data
+            await loadUserData();
+            
+            // Update UI
+            updateUI();
+            
+            // Setup navigation
+            setupNavigation();
+            
+            // Call initApp after initial setup is done
+            await initApp(); // Call the original initApp logic after basic setup
         });
+
+        // New function to initialize Firebase and related components
+        function initializeFirebase() {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            rtdb = firebase.database();
+            console.log('[v0] Firebase initialized');
+        }
+
+        // Function to set up navigation logic
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    const pageId = this.querySelector('.nav-label').textContent.toLowerCase() + 'Page';
+                    showPage(pageId);
+                });
+            });
+            // Set initial active page
+            showPage('homePage');
+        }
+
     </script>
 </body>
 </html>
