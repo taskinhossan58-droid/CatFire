@@ -1114,11 +1114,11 @@
 
                     <div class="task-card">
                         <div class="task-header">
-                            <div class="task-title">🎥 Watch YouTube Video</div>
+                            <div class="task-title">🧾Find the code </div>
                             <div class="task-reward">$<span id="youtubeReward">0.15</span></div>
                         </div>
                         <div class="task-description">
-                            Watch video and collect code
+                            Visit the website and collect the code.
                         </div>
                         <div class="task-progress">
                             <span>Today's Progress</span>
@@ -1128,7 +1128,7 @@
                             <div class="progress-fill" id="youtubeProgress" style="width: 0%"></div>
                         </div>
                         <button class="task-btn active" id="youtubeBtn" onclick="watchYoutubeVideo()">
-                            Watch Video
+                            Visit website
                         </button>
                     </div>
                     
@@ -1210,9 +1210,9 @@
             </h2>
 
             <div class="withdraw-notice">
-                <h3>Withdrawal Instructions</h3>
+                <h3>Must have a minimum of $100 and 15 referrals in the account.</h3>
                 <p>• Minimum Withdrawal: $<span id="minWithdraw">5.00</span></p>
-                <p>• Processing Time: 24-48 Hours</p>
+                <p>• Processing Time: Instant</p>
                 <p>• Provide accurate information</p>
             </div>
 
@@ -1231,7 +1231,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Mobile Number</label>
-                    <input type="tel" class="form-input" id="mobileNumber" required placeholder="+880...">
+                    <input type="tel" class="form-input" id="mobileNumber" required placeholder="+1...">
                 </div>
 
                 <div class="form-group">
@@ -2145,11 +2145,11 @@
             if (!videoData) { showNotification('Video not found', 'error'); return; }
             
             const modal = document.getElementById('taskModal');
-            document.getElementById('modalTitle').textContent = 'YouTube Video';
-            document.getElementById('modalText').textContent = 'Click the button to watch the video on YouTube, then enter the code';
+            document.getElementById('modalTitle').textContent = 'Website Visit';
+            document.getElementById('modalText').textContent = 'First click on the "Find the code" button and find the code, then enter the code below and click on the "Submit" button.';
             document.getElementById('modalContent').innerHTML = `
                 <button class="btn btn-primary" onclick="window.open('${videoData.url}', '_blank')" style="width: 100%; margin-bottom: 15px;">
-                    ▶️ Open YouTube Video
+                    🧾Find the code
                 </button>
                 <div class="code-input-group">
                     <input type="text" class="form-input code-input" id="videoCode" placeholder="Enter code">
