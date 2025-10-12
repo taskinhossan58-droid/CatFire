@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='9937367' data-sdk='show_9937367'></script>
     
     <style>
@@ -32,6 +31,7 @@
             --text-primary: #ffffff;
             --text-secondary: #b8b8b8;
             --border-color: #2d3561;
+            --verified-color: #00BFFF;
         }
 
         body {
@@ -41,6 +41,45 @@
             min-height: 100vh;
             padding-bottom: 140px;
         }
+        
+        .blue-tick {
+            color: var(--verified-color);
+            margin-left: 5px;
+            font-size: 16px;
+            display: none;
+        }
+
+        .task-locked {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .verification-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .verification-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .verification-btn.verified {
+            background: var(--success-color);
+            cursor: default;
+        }
+
 
         /* VPN Warning Modal */
         .vpn-warning {
@@ -975,46 +1014,37 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
     </div>
 
-    <!-- VPN Warning -->
     <div class="vpn-warning" id="vpnWarning">
         <div class="vpn-content">
             <div class="vpn-icon">⚠️</div>
-            <!-- Translate VPN warning to English -->
             <h2>VPN Detected!</h2>
             <p>Your VPN is active. Please turn off your VPN and refresh the page to use this app.</p>
         </div>
     </div>
 
-    <!-- Welcome Modal -->
     <div class="welcome-modal" id="welcomeModal">
         <div class="welcome-content">
-            <!-- Translate welcome message to English -->
             <h2>Welcome! 🎉</h2>
             <p id="welcomeMessage">Welcome to Cat Fire! Complete tasks and earn money.</p>
             <button class="welcome-btn" onclick="closeWelcomeModal()">Get Started</button>
         </div>
     </div>
 
-    <!-- Header -->
     <div class="header">
         <h1>🔥 Cat Fire</h1>
         <div class="user-info">
-            <span id="userName">Loading...</span>
+            <span id="userName">Loading...</span><span class="blue-tick" id="blueTick">✔</span>
             <span>•</span>
             <span id="userId">ID: ...</span>
         </div>
     </div>
 
-    <!-- Home Page -->
     <div class="page active" id="homePage">
-        <!-- Balance Card -->
         <div class="balance-card">
-            <!-- Translate balance label to English -->
             <div class="balance-label">Your Balance</div>
             <div class="balance-amount">$<span id="userBalance">0.00</span></div>
             <div class="balance-actions">
@@ -1026,166 +1056,152 @@
                 </button>
             </div>
         </div>
-
+        
         <div class="container">
-            <!-- Spin Game Section -->
-            
-            <!-- Completely hide spin game section -->
-             
-            <div class="task-section" style="display: none;">
-                <h2 class="section-title">
-                    <span class="section-icon">🎰</span>
-                    Spin Game
-                </h2>
-                <div class="spin-container">
-                    <div class="bet-options">
-                        <button class="bet-btn" data-bet="low" onclick="selectBet('low')">
-                            Low<br>$0.10
-                        </button>
-                        <button class="bet-btn selected" data-bet="medium" onclick="selectBet('medium')">
-                            Medium<br>$0.50
-                        </button>
-                        <button class="bet-btn" data-bet="high" onclick="selectBet('high')">
-                            High<br>$1.00
-                        </button>
-                    </div>
-                    <div class="spin-wheel" id="spinWheel">
-                        <div class="spin-pointer"></div>
-                        <canvas id="wheelCanvas" width="300" height="300"></canvas>
-                        <div class="spin-center" onclick="spinWheel()">SPIN</div>
-                    </div>
-                    <div style="text-align: center; color: var(--text-secondary);">
-                        <p>Today's Spins: <span id="todaySpins">0</span>/10</p>
-                    </div>
-                </div>
-            </div>
-            
 
-            <!-- Daily Tasks Section -->
-            <div class="task-section">
-                <h2 class="section-title">
-                    <span class="section-icon">📋</span>
-                    <!-- Translate to English -->
-                    Daily Tasks
-                </h2>
-
-                <!-- Monetag Ad Task -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">📺 Watch Rewarded Ad</div>
-                        <div class="task-reward">$<span id="monetagReward">0.05</span></div>
-                    </div>
-                    <div class="task-description">
-                        Watch ads to earn rewards
-                    </div>
-                    <div class="task-progress">
-                        <span>Today's Progress</span>
-                        <span><span id="monetagCount">0</span>/<span id="monetagLimit">10</span></span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="monetagProgress" style="width: 0%"></div>
-                    </div>
-                    <button class="task-btn active" id="monetagBtn" onclick="watchMonetagAd()">
-                        Watch Ad
-                    </button>
-                </div>
-
-                <!-- Direct Link Task -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">🔗 Visit Direct Link</div>
-                        <div class="task-reward">$<span id="directLinkReward">0.10</span></div>
-                    </div>
-                    <div class="task-description">
-                        Visit link and stay for the required time
-                    </div>
-                    <div class="task-progress">
-                        <span>Today's Progress</span>
-                        <span><span id="directLinkCount">0</span>/3</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="directLinkProgress" style="width: 0%"></div>
-                    </div>
-                    <button class="task-btn active" id="directLinkBtn" onclick="visitDirectLink()">
-                        Visit Link
-                    </button>
-                </div>
-
-                <!-- YouTube Video Task -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">🎥 Watch YouTube Video</div>
-                        <div class="task-reward">$<span id="youtubeReward">0.15</span></div>
-                    </div>
-                    <div class="task-description">
-                        Watch video and collect code
-                    </div>
-                    <div class="task-progress">
-                        <span>Today's Progress</span>
-                        <span><span id="youtubeCount">0</span>/3</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="youtubeProgress" style="width: 0%"></div>
-                    </div>
-                    <button class="task-btn active" id="youtubeBtn" onclick="watchYoutubeVideo()">
-                        Watch Video
-                    </button>
-                </div>
-
-                <!-- Daily Login Bonus -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">🎁 Daily Login Bonus</div>
-                        <div class="task-reward">$<span id="loginBonusReward">0.20</span></div>
-                    </div>
-                    <div class="task-description">
-                        Login daily and get bonus
-                    </div>
-                    <button class="task-btn active" id="loginBonusBtn" onclick="claimLoginBonus()">
-                        Claim Now
-                    </button>
-                </div>
+            <div class="verification-card" id="verificationContainer">
+                <h2 class="section-title" style="justify-content: center;">Account Verification</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Verify your account to unlock all tasks and features.</p>
+                <button class="verification-btn" id="verificationBtn" onclick="verifyAccount()">Verify</button>
             </div>
 
-            <!-- One-Time Tasks Section -->
-            <div class="task-section">
-                <h2 class="section-title">
-                    <span class="section-icon">⭐</span>
-                    One-Time Tasks
-                </h2>
+            <div class="task-section task-locked" id="allTasks">
+                <div class="task-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">📋</span>
+                        Daily Tasks
+                    </h2>
 
-                <!-- Telegram Channel Task -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">📢 Join Telegram Channel</div>
-                        <div class="task-reward">$<span id="telegramBonusReward">0.50</span></div>
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">📺 Watch Rewarded Ad</div>
+                            <div class="task-reward">$<span id="monetagReward">0.05</span></div>
+                        </div>
+                        <div class="task-description">
+                            Watch ads to earn rewards
+                        </div>
+                        <div class="task-progress">
+                            <span>Today's Progress</span>
+                            <span><span id="monetagCount">0</span>/<span id="monetagLimit">10</span></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="monetagProgress" style="width: 0%"></div>
+                        </div>
+                        <button class="task-btn active" id="monetagBtn" onclick="watchMonetagAd()">
+                            Watch Ad
+                        </button>
                     </div>
-                    <div class="task-description">
-                        Join our Telegram channel
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">🔗 Visit Direct Link</div>
+                            <div class="task-reward">$<span id="directLinkReward">0.10</span></div>
+                        </div>
+                        <div class="task-description">
+                            Visit link and stay for the required time
+                        </div>
+                        <div class="task-progress">
+                            <span>Today's Progress</span>
+                            <span><span id="directLinkCount">0</span>/3</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="directLinkProgress" style="width: 0%"></div>
+                        </div>
+                        <button class="task-btn active" id="directLinkBtn" onclick="visitDirectLink()">
+                            Visit Link
+                        </button>
                     </div>
-                    <button class="task-btn active" id="telegramBtn" onclick="joinTelegramChannel()">
-                        Join Now
-                    </button>
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">🎥 Watch YouTube Video</div>
+                            <div class="task-reward">$<span id="youtubeReward">0.15</span></div>
+                        </div>
+                        <div class="task-description">
+                            Watch video and collect code
+                        </div>
+                        <div class="task-progress">
+                            <span>Today's Progress</span>
+                            <span><span id="youtubeCount">0</span>/3</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="youtubeProgress" style="width: 0%"></div>
+                        </div>
+                        <button class="task-btn active" id="youtubeBtn" onclick="watchYoutubeVideo()">
+                            Watch Video
+                        </button>
+                    </div>
+                    
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">📱 Complete Telegram Task</div>
+                            <div class="task-reward">$<span id="telegramTaskReward">0.15</span></div>
+                        </div>
+                        <div class="task-description">
+                           Join our channel and get the code to earn rewards.
+                        </div>
+                        <div class="task-progress">
+                            <span>Today's Progress</span>
+                            <span><span id="telegramTaskCount">0</span>/3</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="telegramTaskProgress" style="width: 0%"></div>
+                        </div>
+                        <button class="task-btn active" id="telegramTaskBtn" onclick="doTelegramTask()">
+                            Start Task
+                        </button>
+                    </div>
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">🎁 Daily Login Bonus</div>
+                            <div class="task-reward">$<span id="loginBonusReward">0.20</span></div>
+                        </div>
+                        <div class="task-description">
+                            Login daily and get bonus
+                        </div>
+                        <button class="task-btn active" id="loginBonusBtn" onclick="claimLoginBonus()">
+                            Claim Now
+                        </button>
+                    </div>
                 </div>
 
-                <!-- YouTube Subscribe Task -->
-                <div class="task-card">
-                    <div class="task-header">
-                        <div class="task-title">▶️ Subscribe YouTube</div>
-                        <div class="task-reward">$<span id="youtubeSubBonusReward">0.50</span></div>
+                <div class="task-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">⭐</span>
+                        One-Time Tasks
+                    </h2>
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">📢 Join Telegram Channel</div>
+                            <div class="task-reward">$<span id="telegramBonusReward">0.50</span></div>
+                        </div>
+                        <div class="task-description">
+                            Join our Telegram channel
+                        </div>
+                        <button class="task-btn active" id="telegramBtn" onclick="joinTelegramChannel()">
+                            Join Now
+                        </button>
                     </div>
-                    <div class="task-description">
-                        Subscribe to our YouTube channel
+
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">▶️ Subscribe YouTube</div>
+                            <div class="task-reward">$<span id="youtubeSubBonusReward">0.50</span></div>
+                        </div>
+                        <div class="task-description">
+                            Subscribe to our YouTube channel
+                        </div>
+                        <button class="task-btn active" id="youtubeSubBtn" onclick="subscribeYoutube()">
+                            Subscribe
+                        </button>
                     </div>
-                    <button class="task-btn active" id="youtubeSubBtn" onclick="subscribeYoutube()">
-                        Subscribe
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Withdraw Page -->
     <div class="page" id="withdrawPage">
         <div class="container">
             <h2 class="section-title">
@@ -1254,7 +1270,6 @@
         </div>
     </div>
 
-    <!-- Referral Page -->
     <div class="page" id="referralPage">
         <div class="container">
             <div class="referral-card">
@@ -1301,7 +1316,6 @@
         </div>
     </div>
 
-    <!-- Profile Page -->
     <div class="page" id="profilePage">
         <div class="profile-header">
             <div class="profile-avatar">👤</div>
@@ -1347,27 +1361,25 @@
     
 
 
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <button class="nav-item active" onclick="showPage('homePage')">
+        <button class="nav-item active" onclick="showPage('homePage', this)">
             <div class="nav-icon">🏠</div>
             <div class="nav-label">Home</div>
         </button>
-        <button class="nav-item" onclick="showPage('withdrawPage')">
+        <button class="nav-item" onclick="showPage('withdrawPage', this)">
             <div class="nav-icon">💰</div>
             <div class="nav-label">Withdraw</div>
         </button>
-        <button class="nav-item" onclick="showPage('referralPage')">
+        <button class="nav-item" onclick="showPage('referralPage', this)">
             <div class="nav-icon">🎁</div>
             <div class="nav-label">Refer</div>
         </button>
-        <button class="nav-item" onclick="showPage('profilePage')">
+        <button class="nav-item" onclick="showPage('profilePage', this)">
             <div class="nav-icon">👤</div>
             <div class="nav-label">Profile</div>
         </button>
     </div>
 
-    <!-- Modals -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <h3 class="modal-title" id="modalTitle">Task</h3>
@@ -1391,23 +1403,19 @@
             messagingSenderId: "320717959791",
             appId: "1:320717959791:web:8a6d191972cf263a7d939a"
         };
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const rtdb = firebase.database();
-
         // Telegram Web App
         const tg = window.Telegram.WebApp;
         tg.expand();
-
         // Global Variables
         let currentUser = null;
         let userData = null;
         let adminSettings = null;
         let selectedBet = 'medium';
         let isSpinning = false;
-
         // VPN Detection
         async function detectVPN() {
             try {
@@ -1432,7 +1440,6 @@
         // Initialize App
         async function initApp() {
             console.log('[v0] Initializing app...');
-            
             const hasVPN = await detectVPN();
             if (hasVPN) {
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -1440,7 +1447,6 @@
             }
 
             const telegramUser = tg.initDataUnsafe?.user;
-            
             if (!telegramUser) {
                 showNotification('Telegram data not found', 'error');
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -1448,7 +1454,6 @@
             }
 
             console.log('[v0] Telegram user:', telegramUser);
-
             try {
                 await authenticateUser(telegramUser);
                 await loadAdminSettings();
@@ -1458,12 +1463,9 @@
                 
                 showWelcomeModal();
                 updateUI();
-                // initSpinWheel();
                 
                 initializeMonetagAds();
                 
-                // setInterval(showInterstitialAd, 60000);
-
                 document.getElementById('loadingScreen').classList.add('hidden');
             } catch (error) {
                 console.error('[v0] Init error:', error);
@@ -1475,7 +1477,6 @@
         // Monetag Ads Initialization
         function initializeMonetagAds() {
             console.log('[v0] Initializing Monetag ads...');
-            
             // Banner Ad
             try {
                 if (typeof show_9937367 !== 'undefined') {
@@ -1535,10 +1536,12 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 isBlocked: false,
+                isVerified: false,
                 dailyTasks: {
                     monetag: { count: 0, lastReset: new Date().toDateString() },
                     directLink: { count: 0, lastReset: new Date().toDateString() },
                     youtube: { count: 0, lastReset: new Date().toDateString() },
+                    telegramTask: { count: 0, lastReset: new Date().toDateString() },
                     loginBonus: { claimed: false, lastClaim: null },
                     spin: { count: 0, lastReset: new Date().toDateString() },
                     interstitial: { count: 0, lastReset: new Date().toDateString() }
@@ -1550,13 +1553,11 @@
                 withdrawals: [],
                 referrals: []
             };
-
             await db.collection('users').doc(userId).set(newUserData);
             await rtdb.ref(`users/${userId}`).set({
                 online: true,
                 lastSeen: firebase.database.ServerValue.TIMESTAMP
             });
-
             console.log('[v0] User data initialized with bonus:', signupBonus);
         }
 
@@ -1595,7 +1596,6 @@
                     const settings = await loadAdminSettings();
                     const referralBonus = settings?.referralBonus || 1.00;
                     const referredBonus = settings?.referredBonus || 2.00;
-                    
                     // Update referrer's data
                     await db.collection('users').doc(referrerId).update({
                         balance: firebase.firestore.FieldValue.increment(referralBonus),
@@ -1608,14 +1608,13 @@
                             earned: referralBonus
                         })
                     });
-
                     // Give bonus to referred user
                     await db.collection('users').doc(newUserId).update({
                         balance: firebase.firestore.FieldValue.increment(referredBonus),
                         taskEarnings: firebase.firestore.FieldValue.increment(referredBonus),
+                        
                         referrerId: referrerId
                     });
-
                     console.log('[v0] Referral system updated successfully');
                     await sendTelegramNotification(referrerId, `🎉 New referral! ${newUserName} joined using your link. You received $${referralBonus}!`);
                     await sendTelegramNotification(newUserId, `🎁 Referral Bonus! You received a bonus of $${referredBonus}.`);
@@ -1628,14 +1627,11 @@
         // Improved Referral Checking
         async function checkAndProcessReferral() {
             const referrerId = getReferrerFromUrl();
-            
             if (referrerId && userData && !userData.referrerId) {
                 const userId = userData.telegramId;
-                
                 // Prevent self-referral
                 if (referrerId !== userId) {
                     console.log('[v0] Referral detected:', referrerId, '->', userId);
-                    
                     try {
                         // Verify referrer exists
                         const referrerDoc = await db.collection('users').doc(referrerId).get();
@@ -1644,7 +1640,6 @@
                             await db.collection('users').doc(userId).update({ 
                                 referrerId: referrerId 
                             });
-                            
                             // Reload user data to reflect changes
                             await loadUserData();
                             updateUI();
@@ -1666,7 +1661,6 @@
         // Improved Referral Link Generation
         function generateReferralLink() {
             if (!userData) return 'Loading...';
-            
             let baseUrl = 'https://t.me/CatFire_Bot';
             let referralLink = `${baseUrl}?startapp=${userData.telegramId}`;
             
@@ -1679,7 +1673,6 @@
         // Update Referral Link Display
         function updateReferralUI() {
             if (!userData) return;
-            
             const referralLink = generateReferralLink();
             document.getElementById('referralLink').textContent = referralLink;
             document.getElementById('referralLink').setAttribute('data-link', referralLink);
@@ -1696,7 +1689,7 @@
                     console.log('[v0] Admin settings loaded');
                     return adminSettings;
                 } else {
-                    adminSettings = { 
+                     adminSettings = { 
                         minWithdraw: 5.00, 
                         referralBonus: 1.00, 
                         referredBonus: 2.00, 
@@ -1706,6 +1699,7 @@
                         directLinks: [], 
                         youtubeReward: 0.15, 
                         youtubeVideos: [], 
+                        telegramTasks: [],
                         loginBonusReward: 0.20, 
                         telegramBonusReward: 0.50, 
                         telegramChannelLink: '', 
@@ -1731,32 +1725,34 @@
 
             const userId = telegramUser.id.toString();
             const userDoc = await db.collection('users').doc(userId).get();
-
             if (userDoc.exists) {
                 userData = userDoc.data();
-                
                 const today = new Date().toDateString();
                 let needsUpdate = false;
                 
                 const dailyTasks = userData.dailyTasks;
                 if (dailyTasks.monetag.lastReset !== today) { 
-                    dailyTasks.monetag = { count: 0, lastReset: today }; 
+                    dailyTasks.monetag = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
                 if (dailyTasks.directLink.lastReset !== today) { 
-                    dailyTasks.directLink = { count: 0, lastReset: today }; 
+                    dailyTasks.directLink = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
                 if (dailyTasks.youtube.lastReset !== today) { 
-                    dailyTasks.youtube = { count: 0, lastReset: today }; 
+                    dailyTasks.youtube = { count: 0, lastReset: today };
+                    needsUpdate = true; 
+                }
+                if (!dailyTasks.telegramTask || dailyTasks.telegramTask.lastReset !== today) { 
+                    dailyTasks.telegramTask = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
                 if (dailyTasks.spin.lastReset !== today) { 
-                    dailyTasks.spin = { count: 0, lastReset: today }; 
+                    dailyTasks.spin = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
                 if (!dailyTasks.interstitial || dailyTasks.interstitial.lastReset !== today) { 
-                    dailyTasks.interstitial = { count: 0, lastReset: today }; 
+                    dailyTasks.interstitial = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
                 
@@ -1775,19 +1771,73 @@
                 console.log('[v0] User data loaded:', userData);
             }
         }
+        
+         function verifyAccount() {
+            const botUsername = 'catfire_bot';
+            const startUrl = `https://t.me/${botUsername}?start=verify`;
+
+            // Open the link to the bot
+            tg.openTelegramLink(startUrl);
+
+            // Update the UI immediately for a better user experience
+            const verificationBtn = document.getElementById('verificationBtn');
+            verificationBtn.textContent = 'Verified';
+            verificationBtn.classList.add('verified');
+            verificationBtn.disabled = true;
+
+            document.getElementById('allTasks').classList.remove('task-locked');
+            document.getElementById('blueTick').style.display = 'inline';
+            showNotification('Account Verified! Tasks Unlocked.', 'success');
+
+            // Update user's verification status in the database
+            if (userData) {
+                db.collection('users').doc(userData.telegramId).update({
+                    isVerified: true
+                }).then(() => {
+                    userData.isVerified = true; 
+                    console.log('User verification status updated in Firestore.');
+                }).catch(error => {
+                    console.error('Error updating verification status:', error);
+                    // Optionally, revert the UI changes if the database update fails
+                });
+            }
+        }
+
 
         function updateUI() {
             if (!userData) return;
+            
+            // Verification status
+            if (userData.isVerified) {
+                const verificationBtn = document.getElementById('verificationBtn');
+                verificationBtn.textContent = 'Verified';
+                verificationBtn.classList.add('verified');
+                verificationBtn.disabled = true;
+                document.getElementById('allTasks').classList.remove('task-locked');
+                document.getElementById('blueTick').style.display = 'inline';
+            } else {
+                document.getElementById('allTasks').classList.add('task-locked');
+                document.getElementById('blueTick').style.display = 'none';
+            }
 
             document.getElementById('userName').textContent = userData.firstName;
             document.getElementById('userId').textContent = `ID: ${userData.telegramId}`;
             document.getElementById('userBalance').textContent = userData.balance.toFixed(2);
-
             if (adminSettings) {
                 document.getElementById('monetagReward').textContent = adminSettings.monetagReward.toFixed(2);
                 document.getElementById('monetagLimit').textContent = adminSettings.monetagLimit;
                 document.getElementById('directLinkReward').textContent = adminSettings.directLinkReward.toFixed(2);
                 document.getElementById('youtubeReward').textContent = adminSettings.youtubeReward.toFixed(2);
+                
+                // Set default telegram task reward if not set
+                const telegramTaskCard = document.querySelector('.task-card:has(#telegramTaskReward)');
+                if (adminSettings.telegramTasks && adminSettings.telegramTasks.length > 0) {
+                    telegramTaskCard.style.display = 'block';
+                    document.getElementById('telegramTaskReward').textContent = (adminSettings.telegramTasks[0]?.reward || 0.15).toFixed(2);
+                } else {
+                    telegramTaskCard.style.display = 'none';
+                }
+
                 document.getElementById('loginBonusReward').textContent = adminSettings.loginBonusReward.toFixed(2);
                 document.getElementById('telegramBonusReward').textContent = adminSettings.telegramBonusReward.toFixed(2);
                 document.getElementById('youtubeSubBonusReward').textContent = adminSettings.youtubeSubBonusReward.toFixed(2);
@@ -1807,8 +1857,6 @@
 
             updateTaskProgress();
             updateOneTimeTasks();
-
-            document.getElementById('todaySpins').textContent = userData.dailyTasks.spin.count;
             
             document.getElementById('profileName').textContent = `${userData.firstName} ${userData.lastName || ''}`;
             document.getElementById('profileUsername').textContent = userData.username ? `@${userData.username}` : 'No username';
@@ -1828,8 +1876,8 @@
         }
 
         function updateTaskProgress() {
-            const { monetag, directLink, youtube, loginBonus } = userData.dailyTasks;
-            const monetagLimit = adminSettings.monetagLimit;
+            const { monetag, directLink, youtube, telegramTask, loginBonus } = userData.dailyTasks;
+            const monetagLimit = adminSettings?.monetagLimit || 10;
 
             document.getElementById('monetagCount').textContent = monetag.count;
             document.getElementById('monetagProgress').style.width = `${(monetag.count / monetagLimit) * 100}%`;
@@ -1856,6 +1904,16 @@
                 youtubeBtn.classList.replace('active', 'completed');
                 youtubeBtn.textContent = 'Completed';
                 youtubeBtn.disabled = true;
+            }
+            
+            const telegramTaskCount = telegramTask?.count || 0;
+            document.getElementById('telegramTaskCount').textContent = telegramTaskCount;
+            document.getElementById('telegramTaskProgress').style.width = `${(telegramTaskCount / 3) * 100}%`;
+            const telegramTaskBtn = document.getElementById('telegramTaskBtn');
+            if (telegramTaskCount >= 3) {
+                telegramTaskBtn.classList.replace('active', 'completed');
+                telegramTaskBtn.textContent = 'Completed';
+                telegramTaskBtn.disabled = true;
             }
             
             const loginBonusBtn = document.getElementById('loginBonusBtn');
@@ -1894,11 +1952,11 @@
             document.getElementById('welcomeModal').classList.remove('active');
         }
 
-        function showPage(pageId) {
+        function showPage(pageId, element) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            element.classList.add('active');
             if (pageId === 'profilePage') {
                 drawEarningsChart();
                 drawReferralChart();
@@ -1958,12 +2016,10 @@
             const modalContent = document.getElementById('modalContent');
             const modalActionBtn = document.getElementById('modalActionBtn');
             const modalCloseBtn = modal.querySelector('.btn-secondary');
-
             modalTitle.textContent = 'Advertisement';
             modalText.textContent = 'Watch the ad to receive your reward.';
             modalActionBtn.style.display = 'none';
             modalCloseBtn.style.display = 'none';
-
             let timeLeft = duration;
             modalContent.innerHTML = `<div class="timer-display">${timeLeft}</div>`;
             modal.classList.add('active');
@@ -1995,7 +2051,6 @@
             try {
                 if (typeof show_9937367 !== 'undefined') {
                     show_9937367();
-                    
                     // Wait for ad to complete
                     setTimeout(async () => {
                         const reward = adminSettings.monetagReward;
@@ -2029,18 +2084,14 @@
         // Show Interstitial Ad
         async function showInterstitialAd() {
             if (!userData || !adminSettings) return;
-
             if (userData.dailyTasks.interstitial.count < 10) {
                 console.log(`Showing interstitial ad, count: ${userData.dailyTasks.interstitial.count}`);
-                
                 try {
                     if (typeof show_9937367 !== 'undefined') {
                         show_9937367();
-                        
                         await db.collection('users').doc(userData.telegramId).update({
                             'dailyTasks.interstitial.count': firebase.firestore.FieldValue.increment(1)
                         });
-                        
                         userData.dailyTasks.interstitial.count++;
                     } else {
                         console.log('[v0] Monetag interstitial function not available');
@@ -2051,76 +2102,6 @@
             } else {
                 console.log('Interstitial ad daily limit reached.');
             }
-        }
-
-        // Spin Wheel Functions
-        function initSpinWheel() {
-            const canvas = document.getElementById('wheelCanvas');
-            const ctx = canvas.getContext('2d');
-            const rewards = adminSettings.spinRewards || [1, 2, 5, 10, 100];
-            const colors = ['#FF6B35', '#F7931E', '#4CAF50', '#2196F3', '#9C27B0'];
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2;
-            const sliceAngle = (2 * Math.PI) / rewards.length;
-            rewards.forEach((reward, index) => {
-                const startAngle = index * sliceAngle;
-                const endAngle = startAngle + sliceAngle;
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[index % colors.length];
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + sliceAngle / 2);
-                ctx.textAlign = 'center';
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 20px Arial';
-                ctx.fillText(`$${reward}`, radius / 2, 10);
-                ctx.restore();
-            });
-        }
-
-        function selectBet(bet) {
-            selectedBet = bet;
-            document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-
-        async function spinWheel() {
-            if (isSpinning) return;
-            if (userData.dailyTasks.spin.count >= 10) {
-                showNotification('Today\'s spins are finished', 'warning');
-                return;
-            }
-            const betAmounts = { low: 0.10, medium: 0.50, high: 1.00 };
-            const betAmount = betAmounts[selectedBet];
-            if (userData.balance < betAmount) {
-                showNotification('Insufficient balance', 'error');
-                return;
-            }
-            isSpinning = true;
-            await db.collection('users').doc(userData.telegramId).update({ balance: firebase.firestore.FieldValue.increment(-betAmount) });
-            const rewards = adminSettings.spinRewards || [1, 2, 5, 10, 100];
-            const randomIndex = Math.floor(Math.random() * rewards.length);
-            const winAmount = rewards[randomIndex];
-            setTimeout(async () => {
-                const totalWin = winAmount * (selectedBet === 'low' ? 1 : selectedBet === 'medium' ? 2 : 3);
-                await db.collection('users').doc(userData.telegramId).update({
-                    balance: firebase.firestore.FieldValue.increment(totalWin),
-                    gameEarnings: firebase.firestore.FieldValue.increment(totalWin),
-                    'dailyTasks.spin.count': firebase.firestore.FieldValue.increment(1)
-                });
-                await loadUserData();
-                updateUI();
-                showNotification(`Congratulations! You won $${totalWin.toFixed(2)}!`, 'success');
-                isSpinning = false;
-            }, 3000);
         }
 
         // Other task functions
@@ -2141,7 +2122,6 @@
 
         function startDirectLinkTimer(seconds, reward) {
             showNotification(`Stay on the link for ${seconds} seconds. Don't close early or you won't get the bonus!`, 'warning');
-            
             const endTime = Date.now() + (seconds * 1000);
             const checkInterval = setInterval(async () => {
                 if (Date.now() >= endTime) {
@@ -2179,11 +2159,55 @@
             document.getElementById('modalActionBtn').onclick = () => verifyVideoCode(videoData.code, videoData.reward);
             modal.classList.add('active');
         }
+        
+        async function doTelegramTask() {
+            const taskCount = userData.dailyTasks.telegramTask?.count || 0;
+            if (taskCount >= 3) {
+                showNotification("Today's limit reached", 'warning');
+                return;
+            }
+            if (!adminSettings.telegramTasks || adminSettings.telegramTasks.length === 0) {
+                showNotification('No tasks available', 'error');
+                return;
+            }
+            const taskIndex = taskCount;
+            const taskData = adminSettings.telegramTasks[taskIndex];
+            if (!taskData) {
+                showNotification('Task not found', 'error');
+                return;
+            }
 
-        function extractYoutubeId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+            const modal = document.getElementById('taskModal');
+            document.getElementById('modalTitle').textContent = 'Telegram Task';
+            document.getElementById('modalText').textContent = taskData.description;
+            document.getElementById('modalContent').innerHTML = `
+                <button class="btn btn-primary" onclick="window.open('${taskData.url}', '_blank')" style="width: 100%; margin-bottom: 15px;">
+                    🔗 Go to Link
+                </button>
+                <div class="code-input-group">
+                    <input type="text" class="form-input code-input" id="telegramTaskCode" placeholder="Enter code">
+                </div>
+            `;
+            document.getElementById('modalActionBtn').textContent = 'Submit';
+            document.getElementById('modalActionBtn').onclick = () => verifyTelegramCode(taskData.code, taskData.reward);
+            modal.classList.add('active');
+        }
+
+        async function verifyTelegramCode(correctCode, reward) {
+            const enteredCode = document.getElementById('telegramTaskCode').value.trim();
+            if (enteredCode.toLowerCase() === correctCode.toLowerCase()) {
+                await db.collection('users').doc(userData.telegramId).update({
+                    balance: firebase.firestore.FieldValue.increment(reward),
+                    taskEarnings: firebase.firestore.FieldValue.increment(reward),
+                    'dailyTasks.telegramTask.count': firebase.firestore.FieldValue.increment(1)
+                });
+                await loadUserData();
+                updateUI();
+                closeModal();
+                showNotification(`$${reward.toFixed(2)} added!`, 'success');
+            } else {
+                showNotification('Incorrect code', 'error');
+            }
         }
 
         async function verifyVideoCode(correctCode, reward) {
@@ -2301,9 +2325,11 @@
         }
 
         function drawEarningsChart() {
-            const canvas = document.getElementById('earningsChart'); if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const canvas = document.getElementById('earningsChart');
+            if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
             const data = [{ label: 'Tasks', value: userData.taskEarnings || 0 }, { label: 'Games', value: userData.gameEarnings || 0 }, { label: 'Referrals', value: userData.referralEarnings || 0 }];
-            const maxValue = Math.max(...data.map(d => d.value), 1); const barWidth = canvas.width / data.length - 20; const maxHeight = canvas.height - 40;
+            const maxValue = Math.max(...data.map(d => d.value), 1); const barWidth = canvas.width / data.length - 20;
+            const maxHeight = canvas.height - 40;
             data.forEach((item, index) => {
                 const barHeight = (item.value / maxValue) * maxHeight; const x = index * (barWidth + 20) + 10; const y = canvas.height - barHeight - 20;
                 const gradient = ctx.createLinearGradient(0, y, 0, canvas.height); gradient.addColorStop(0, '#FF6B35'); gradient.addColorStop(1, '#F7931E'); ctx.fillStyle = gradient; ctx.fillRect(x, y, barWidth, barHeight);
@@ -2312,16 +2338,21 @@
         }
 
         function drawReferralChart() {
-            const canvas = document.getElementById('referralChart'); if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!userData.referrals || userData.referrals.length === 0) { ctx.fillStyle = '#666'; ctx.font = '14px Arial'; ctx.textAlign = 'center'; ctx.fillText('No referral data', canvas.width / 2, canvas.height / 2); return; }
-            const referralsByDate = {}; userData.referrals.forEach(ref => { const date = new Date(ref.joinedAt).toLocaleDateString(); referralsByDate[date] = (referralsByDate[date] || 0) + 1; });
+            const canvas = document.getElementById('referralChart');
+            if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!userData.referrals || userData.referrals.length === 0) { ctx.fillStyle = '#666'; ctx.font = '14px Arial'; ctx.textAlign = 'center';
+            ctx.fillText('No referral data', canvas.width / 2, canvas.height / 2); return;
+            }
+            const referralsByDate = {};
+            userData.referrals.forEach(ref => { const date = new Date(ref.joinedAt).toLocaleDateString(); referralsByDate[date] = (referralsByDate[date] || 0) + 1; });
             const dates = Object.keys(referralsByDate).sort((a,b) => new Date(a) - new Date(b)); const counts = dates.map(date => referralsByDate[date]);
             const maxCount = Math.max(...counts, 1); const stepX = canvas.width / (dates.length + 1); const maxHeight = canvas.height - 40;
             ctx.strokeStyle = '#FF6B35'; ctx.lineWidth = 3; ctx.beginPath();
             dates.forEach((date, index) => {
                 const x = (index + 1) * stepX; const y = canvas.height - 20 - (counts[index] / maxCount) * maxHeight;
                 if (index === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
-                ctx.fillStyle = '#FF6B35'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = '#FF6B35'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); 
+                ctx.fill();
             });
             ctx.stroke();
         }
