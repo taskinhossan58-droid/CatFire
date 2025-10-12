@@ -12,7 +12,20 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <script src='//libtl.com/sdk.js' data-zone='9937367' data-sdk='show_9937367'></script>
-    
+    <style>
+  #vpnWarning {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000000ee;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 2rem;
+    text-align: center;
+    padding-top: 20%;
+    z-index: 999999;
+  }
+</style>
     <style>
         * {
             margin: 0;
@@ -2387,5 +2400,30 @@
         // Initialize app on load
         window.addEventListener('load', initApp);
     </script>
+    <div id="vpnWarning">
+  ⚠️ VPN Detected!<br>
+  দয়া করে VPN বন্ধ করে আবার চেষ্টা করুন।
+</div>
+<script>
+  async function checkVPN() {
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+
+      if (data.security && (data.security.vpn || data.security.proxy)) {
+        showVPNWarning();
+      }
+    } catch (err) {
+      console.error("Error checking VPN:", err);
+    }
+  }
+
+  function showVPNWarning() {
+    document.getElementById("vpnWarning").style.display = "block";
+    document.body.style.overflow = "hidden";
+  }
+
+  checkVPN();
+</script>
 </body>
 </html>
