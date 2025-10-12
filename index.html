@@ -1476,7 +1476,23 @@
         function initializeMonetagAds() {
             console.log('[v0] Initializing Monetag ads...');
             
-
+            // Banner Ad
+            try {
+                if (typeof show_9937367 !== 'undefined') {
+                    // Load banner ad in the container
+                    const bannerContainer = document.getElementById('banner-ad-container');
+                    if (bannerContainer) {
+                        show_9937367();
+                        console.log('[v0] Banner ad loaded successfully');
+                    }
+                } else {
+                    console.log('[v0] Monetag SDK not loaded yet, retrying...');
+                    setTimeout(initializeMonetagAds, 1000);
+                }
+            } catch (error) {
+                console.error('[v0] Error loading banner ad:', error);
+            }
+        }
 
         // Authenticate User
         async function authenticateUser(telegramUser) {
