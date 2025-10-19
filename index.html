@@ -1480,6 +1480,7 @@
             }
 
             console.log('[v0] Telegram user:', telegramUser);
+
             try {
                 await authenticateUser(telegramUser);
                 await loadAdminSettings();
@@ -1487,13 +1488,17 @@
                 
                 await checkAndProcessReferral();
                 
-                showWelcomeModal();
+                if (userData && !userData.hasSeenWelcome) {
+                    showWelcomeModal();
+                }
+                
                 updateUI();
                 
                 initializeMonetagAds();
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
             } catch (error) {
+            
                 console.error('[v0] Init error:', error);
                 showNotification('Error starting app', 'error');
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -1563,6 +1568,7 @@
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 isBlocked: false,
                 isVerified: false,
+                hasSeenWelcome: false, // <-- এই লাইনটি যোগ করা হয়েছে
                 dailyTasks: {
                     monetag: { count: 0, lastReset: new Date().toDateString() },
                     directLink: { count: 0, lastReset: new Date().toDateString() },
@@ -1974,8 +1980,22 @@
             document.getElementById('welcomeModal').classList.add('active');
         }
 
-        function closeWelcomeModal() {
+        async function closeWelcomeModal() {
             document.getElementById('welcomeModal').classList.remove('active');
+            
+            // ডাটাবেসে ফ্ল্যাগ আপডেট করুন
+            if (userData) {
+                try {
+                    await db.collection('users').doc(userData.telegramId).update({
+                        hasSeenWelcome: true
+                    });
+                    // অ্যাপের বর্তমান ডেটাও আপডেট করুন
+                    userData.hasSeenWelcome = true; 
+                    console.log('[v0] Welcome modal flag set to true.');
+                } catch (error) {
+                    console.error('[v0] Error updating welcome flag:', error);
+                }
+            }
         }
 
         function showPage(pageId, element) {
