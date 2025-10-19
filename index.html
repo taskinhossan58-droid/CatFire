@@ -274,6 +274,56 @@
             border-left: 4px solid var(--warning-color);
         }
 
+
+        /* --- START: Added for Button Fixes --- */
+        .modal-actions {
+            display: flex;
+            flex-direction: column; /* বাটনগুলি নিচে নিচে দেখাবে */
+            gap: 10px;
+            margin-top: 20px; 
+        }
+        .btn { /* সব বাটনের জন্য সাধারণ স্টাইল */
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%; 
+        }
+        .btn-cancel {
+            background: var(--border-color); /* হালকা ধূসর রঙ */
+            color: var(--text-primary);
+        }
+        .btn-cancel:hover {
+            background: #d1d5db; /* হোভারে গাঢ় ধূসর */
+        }
+        
+        .btn-task-link {
+            background: var(--success-color); /* সবুজ রঙ */
+            color: white;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .btn-task-link:hover {
+            background: #059669; /* হোভারে গাঢ় সবুজ */
+        }
+
+        .btn-submit-main {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%); /* সবুজ গ্র্যাডিয়েন্ট */
+            color: white;
+            width: 100%;
+            padding: 14px; /* বাটনটি একটু বড় করা হলো */
+        }
+        .btn-submit-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        /* --- END: Added for Button Fixes --- */
+
+
+
         /* Welcome Modal */
         .welcome-modal {
             display: none;
@@ -1265,7 +1315,7 @@
                     <input type="text" class="form-input" id="paymentId" required placeholder="Your payment ID">
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <button type="submit" class="btn btn-submit-main">
                     Request Withdrawal
                 </button>
             </form>
@@ -1412,7 +1462,7 @@
             <p class="modal-text" id="modalText">Loading...</p>
             <div id="modalContent"></div>
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" id="modalActionBtn" onclick="modalAction()">OK</button>
             </div>
         </div>
@@ -1845,9 +1895,18 @@
                 verificationBtn.textContent = 'Verified';
                 verificationBtn.classList.add('verified');
                 verificationBtn.disabled = true;
+                
+                // --- FIX 1: ভেরিফাইড হলে ভেরিফিকেশন বক্স হাইড করুন ---
+                document.getElementById('verificationContainer').style.display = 'none'; 
+                // --- END FIX 1 ---
+
                 document.getElementById('allTasks').classList.remove('task-locked');
                 document.getElementById('blueTick').style.display = 'inline';
             } else {
+                // --- FIX 1: ভেরিফাইড না হলে বক্স দেখান ---
+                document.getElementById('verificationContainer').style.display = 'block';
+                // --- END FIX 1 ---
+                
                 document.getElementById('allTasks').classList.add('task-locked');
                 document.getElementById('blueTick').style.display = 'none';
             }
@@ -2151,18 +2210,36 @@
         }
 
         // Other task functions
-        async function visitDirectLink() {
-            if (userData.dailyTasks.directLink.count >= 3) { showNotification('Today\'s limit reached', 'warning'); return; }
-            if (!adminSettings.directLinks || adminSettings.directLinks.length === 0) { showNotification('No links available', 'error'); return; }
-            const linkIndex = userData.dailyTasks.directLink.count;
-            const linkData = adminSettings.directLinks[linkIndex];
-            if (!linkData) { showNotification('Link not found', 'error'); return; }
-            const waitTime = Math.floor(Math.random() * 31) + 20;
+        async function watchYoutubeVideo() {
+            if (userData.dailyTasks.youtube.count >= 3) { showNotification('Today\'s limit reached', 'warning'); return; }
+            if (!adminSettings.youtubeVideos || adminSettings.youtubeVideos.length === 0) { showNotification('No videos available', 'error'); return; }
+            const videoIndex = userData.dailyTasks.youtube.count;
+            const videoData = adminSettings.youtubeVideos[videoIndex];
+            if (!videoData) { showNotification('Video not found', 'error'); return; }
+            
             const modal = document.getElementById('taskModal');
-            document.getElementById('modalTitle').textContent = 'Visit Direct Link';
-            document.getElementById('modalText').textContent = `Stay on the link for ${waitTime} seconds to earn $${linkData.reward.toFixed(2)}`;
-            document.getElementById('modalActionBtn').textContent = 'OK';
-            document.getElementById('modalActionBtn').onclick = () => { closeModal(); window.open(linkData.url, '_blank'); startDirectLinkTimer(waitTime, linkData.reward); };
+            document.getElementById('modalTitle').textContent = 'Website Visit';
+            document.getElementById('modalText').textContent = 'First click on the "Find the code" button and find the code, then enter the code below and click on the "Submit" button.';
+            
+            // --- FIX 3: বাটনের ডিজাইন পরিবর্তন ---
+            document.getElementById('modalContent').innerHTML = `
+                <button class="btn btn-task-link" onclick="window.open('${videoData.url}', '_blank')">
+                    🧾 Find the code
+                </button>
+                <div class="code-input-group">
+                    <input type="text" class="form-input code-input" id="videoCode" placeholder="Enter code">
+                </div>
+            `;
+            // --- END FIX 3 ---
+
+            document.getElementById('modalActionBtn').textContent = 'Submit';
+            document.getElementById('modalActionBtn').onclick = () => verifyVideoCode(videoData.code, videoData.reward);
+
+            // --- FIX 3.2: Cancel বাটন দেখান ---
+            document.querySelector('#taskModal .btn-cancel').style.display = 'block';
+            document.querySelector('#taskModal .btn-primary').style.display = 'block';
+            // --- END FIX 3.2 ---
+
             modal.classList.add('active');
         }
 
@@ -2193,16 +2270,26 @@
             const modal = document.getElementById('taskModal');
             document.getElementById('modalTitle').textContent = 'Website Visit';
             document.getElementById('modalText').textContent = 'First click on the "Find the code" button and find the code, then enter the code below and click on the "Submit" button.';
+            
+            // --- FIX 3: বাটনের ডিজাইন পরিবর্তন ---
             document.getElementById('modalContent').innerHTML = `
-                <button class="btn btn-primary" onclick="window.open('${videoData.url}', '_blank')" style="width: 100%; margin-bottom: 15px;">
-                    🧾Find the code
+                <button class="btn btn-task-link" onclick="window.open('${videoData.url}', '_blank')">
+                    🧾 Find the code
                 </button>
                 <div class="code-input-group">
                     <input type="text" class="form-input code-input" id="videoCode" placeholder="Enter code">
                 </div>
             `;
+            // --- END FIX 3 ---
+
             document.getElementById('modalActionBtn').textContent = 'Submit';
             document.getElementById('modalActionBtn').onclick = () => verifyVideoCode(videoData.code, videoData.reward);
+
+            // --- FIX 3.2: Cancel বাটন দেখান ---
+            document.querySelector('#taskModal .btn-cancel').style.display = 'block';
+            document.querySelector('#taskModal .btn-primary').style.display = 'block';
+            // --- END FIX 3.2 ---
+
             modal.classList.add('active');
         }
         
@@ -2226,16 +2313,26 @@
             const modal = document.getElementById('taskModal');
             document.getElementById('modalTitle').textContent = 'Telegram Task';
             document.getElementById('modalText').textContent = taskData.description;
+
+            // --- FIX 4: বাটনের ডিজাইন পরিবর্তন ---
             document.getElementById('modalContent').innerHTML = `
-                <button class="btn btn-primary" onclick="window.open('${taskData.url}', '_blank')" style="width: 100%; margin-bottom: 15px;">
+                <button class="btn btn-task-link" onclick="window.open('${taskData.url}', '_blank')">
                     🔗 Go to Link
                 </button>
                 <div class="code-input-group">
                     <input type="text" class="form-input code-input" id="telegramTaskCode" placeholder="Enter code">
                 </div>
             `;
+            // --- END FIX 4 ---
+
             document.getElementById('modalActionBtn').textContent = 'Submit';
             document.getElementById('modalActionBtn').onclick = () => verifyTelegramCode(taskData.code, taskData.reward);
+            
+            // --- FIX 4.2: Cancel বাটন দেখান ---
+            document.querySelector('#taskModal .btn-cancel').style.display = 'block';
+            document.querySelector('#taskModal .btn-primary').style.display = 'block';
+            // --- END FIX 4.2 ---
+            
             modal.classList.add('active');
         }
 
