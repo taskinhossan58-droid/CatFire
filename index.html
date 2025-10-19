@@ -2210,38 +2210,30 @@
         }
 
         // Other task functions
-        async function watchYoutubeVideo() {
-            if (userData.dailyTasks.youtube.count >= 3) { showNotification('Today\'s limit reached', 'warning'); return; }
-            if (!adminSettings.youtubeVideos || adminSettings.youtubeVideos.length === 0) { showNotification('No videos available', 'error'); return; }
-            const videoIndex = userData.dailyTasks.youtube.count;
-            const videoData = adminSettings.youtubeVideos[videoIndex];
-            if (!videoData) { showNotification('Video not found', 'error'); return; }
-            
+        async function visitDirectLink() {
+            if (userData.dailyTasks.directLink.count >= 3) { showNotification('Today\'s limit reached', 'warning'); return; }
+            if (!adminSettings.directLinks || adminSettings.directLinks.length === 0) { showNotification('No links available', 'error'); return; }
+            const linkIndex = userData.dailyTasks.directLink.count;
+            const linkData = adminSettings.directLinks[linkIndex];
+            if (!linkData) { showNotification('Link not found', 'error'); return; }
+            const waitTime = Math.floor(Math.random() * 31) + 20;
             const modal = document.getElementById('taskModal');
-            document.getElementById('modalTitle').textContent = 'Website Visit';
-            document.getElementById('modalText').textContent = 'First click on the "Find the code" button and find the code, then enter the code below and click on the "Submit" button.';
+            document.getElementById('modalTitle').textContent = 'Visit Direct Link';
+            document.getElementById('modalText').textContent = `Stay on the link for ${waitTime} seconds to earn $${linkData.reward.toFixed(2)}`;
             
-            // --- FIX 3: বাটনের ডিজাইন পরিবর্তন ---
-            document.getElementById('modalContent').innerHTML = `
-                <button class="btn btn-task-link" onclick="window.open('${videoData.url}', '_blank')">
-                    🧾 Find the code
-                </button>
-                <div class="code-input-group">
-                    <input type="text" class="form-input code-input" id="videoCode" placeholder="Enter code">
-                </div>
-            `;
-            // --- END FIX 3 ---
-
-            document.getElementById('modalActionBtn').textContent = 'Submit';
-            document.getElementById('modalActionBtn').onclick = () => verifyVideoCode(videoData.code, videoData.reward);
-
-            // --- FIX 3.2: Cancel বাটন দেখান ---
+            // --- FIX 2: বাটন সেট করুন এবং দেখান ---
+            document.getElementById('modalContent').innerHTML = ''; // কন্টেন্ট ক্লিয়ার করুন
+            document.getElementById('modalActionBtn').textContent = 'OK';
+            document.getElementById('modalActionBtn').onclick = () => { closeModal(); window.open(linkData.url, '_blank'); startDirectLinkTimer(waitTime, linkData.reward); };
+            
+            // Cancel এবং OK দুটি বাটনই দেখান
             document.querySelector('#taskModal .btn-cancel').style.display = 'block';
             document.querySelector('#taskModal .btn-primary').style.display = 'block';
-            // --- END FIX 3.2 ---
-
+            // --- END FIX 2 ---
+            
             modal.classList.add('active');
         }
+
 
         function startDirectLinkTimer(seconds, reward) {
             showNotification(`Stay on the link for ${seconds} seconds. Don't close early or you won't get the bonus!`, 'warning');
