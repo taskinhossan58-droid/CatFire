@@ -34,22 +34,22 @@
         }
 
         :root {
-            --primary-color: #FF6B35;
-            --secondary-color: #F7931E;
-            --success-color: #4CAF50;
-            --danger-color: #f44336;
-            --warning-color: #ff9800;
-            --dark-bg: #1a1a2e;
-            --card-bg: #16213e;
-            --text-primary: #ffffff;
-            --text-secondary: #b8b8b8;
-            --border-color: #2d3561;
-            --verified-color: #00BFFF;
+            --primary-color: #3B82F6;
+            --secondary-color: #1E40AF;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --dark-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --verified-color: #06B6D4;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #F0F9FF 0%, #F8FAFC 100%);
             color: var(--text-primary);
             min-height: 100vh;
             padding-bottom: 140px;
@@ -67,13 +67,83 @@
             pointer-events: none;
         }
 
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: none;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: white;
+            background: none;
+            -webkit-text-fill-color: unset;
+        }
+
+        .user-info {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            margin: 20px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+            color: white;
+        }
+
+        /* Task Cards */
+        .task-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .task-reward {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        /* Verification Card */
         .verification-card {
             background: var(--card-bg);
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 20px;
             margin: 20px;
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .verification-btn {
@@ -81,62 +151,127 @@
             color: white;
             border: none;
             padding: 12px 40px;
-            border-radius: 25px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .verification-btn.verified {
             background: var(--success-color);
             cursor: default;
         }
 
-
-        /* VPN Warning Modal */
-        .vpn-warning {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .vpn-warning.active {
-            display: flex;
-        }
-
-        .vpn-content {
+        /* Bottom Navigation */
+        .bottom-nav {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 400px;
-            margin: 20px;
-            border: 2px solid var(--danger-color);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        .vpn-icon {
-            font-size: 60px;
-            color: var(--danger-color);
-            margin-bottom: 20px;
-        }
-
-        .vpn-content h2 {
-            color: var(--danger-color);
-            margin-bottom: 15px;
-        }
-
-        .vpn-content p {
+        .nav-item {
             color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.6;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        /* Profile Header */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .profile-avatar {
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid white;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            color: var(--primary-color);
+        }
+
+        /* Referral Card */
+        .referral-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        /* Form Elements */
+        .form-input, .form-select {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Withdraw Notice */
+        .withdraw-notice {
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* History Items */
+        .history-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .withdrawer-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .withdrawer-rank {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Notifications */
+        .notification {
+            background: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
         }
 
         /* Welcome Modal */
@@ -237,90 +372,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Header */
-        .header {
-            background: var(--card-bg);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .header h1 {
-            font-size: 24px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* Balance Card */
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            margin: 20px;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
-        }
-
-        .balance-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-
-        .balance-amount {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .balance-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: white;
-            color: var(--primary-color);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Content Container */
-        .container {
-            padding: 20px;
-        }
-
         /* Task Sections */
         .task-section {
             margin-bottom: 30px;
@@ -338,46 +389,7 @@
             font-size: 24px;
         }
 
-        /* Task Cards */
-        .task-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
-        }
-
-        .task-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2);
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .task-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .task-reward {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .task-description {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
+        /* Task Progress */
         .task-progress {
             display: flex;
             justify-content: space-between;
@@ -402,6 +414,7 @@
             transition: width 0.3s;
         }
 
+        /* Task Buttons */
         .task-btn {
             width: 100%;
             padding: 12px;
@@ -2402,7 +2415,7 @@
     </script>
     <div id="vpnWarning">
   ⚠️ VPN Detected!<br>
-  দয়া করে VPN বন্ধ করে আবার চেষ্টা করুন।
+  দয়া করে VPN বন্ধ করে আবার চেষ্টা করুন।
 </div>
 <script>
   async function checkVPN() {
