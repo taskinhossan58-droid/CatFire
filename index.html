@@ -1171,7 +1171,7 @@
                     <div class="task-card">
                         <div class="task-header">
                             <div class="task-title">🔗 Visit Direct Link</div>
-                            <div class="task-reward">$<span id="directLinkReward">0.10</span></div>
+                            <div class="task-reward">$<span id="directLinkReward">0.30</span></div>
                         </div>
                         <div class="task-description">
                             Visit link and stay for the required time
@@ -1286,7 +1286,7 @@
             </h2>
 
             <div class="withdraw-notice">
-                <h3>Must have a minimum of $110 and 15 referrals in the account.</h3>
+                <h3>Must have a minimum of $60 and 10 referrals in the account.</h3>
                 <p>• Minimum Withdrawal: $<span id="minWithdraw">5.00</span></p>
                 <p>• Processing Time: Instant</p>
                 <p>• Provide accurate information</p>
@@ -2405,14 +2405,34 @@
             }, 5000);
         }
 
-        async function submitWithdraw(event) {
+                async function submitWithdraw(event) {
             event.preventDefault();
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
             const paymentMethod = document.getElementById('paymentMethod').value;
             const mobileNumber = document.getElementById('mobileNumber').value;
             const paymentId = document.getElementById('paymentId').value;
-            if (amount < adminSettings.minWithdraw) { showNotification(`Minimum withdrawal is $${adminSettings.minWithdraw.toFixed(2)}`, 'error'); return; }
-            if (amount > userData.balance) { showNotification('Insufficient balance', 'error'); return; }
+
+            // ন্যূনতম ব্যালেন্স চেক
+            if (amount < adminSettings.minWithdraw) { 
+                showNotification(`Minimum withdrawal is $${adminSettings.minWithdraw.toFixed(2)}`, 'error'); 
+                return; 
+            }
+            // অপর্যাপ্ত ব্যালেন্স চেক
+            if (amount > userData.balance) { 
+                showNotification('Insufficient balance', 'error'); 
+                return; 
+            }
+
+            // --- নতুন সংযোজিত কোড ---
+            // ন্যূনতম রেফারেল চেক
+            const totalReferrals = userData.totalReferrals || 0;
+            if (totalReferrals < 10) {
+                showNotification('Minimum 10 referrals required to withdraw.', 'error');
+                return; // ১০টির কম রেফারেল থাকলে এখানেই থেমে যাবে
+            }
+            // --- কোড সংযোজন শেষ ---
+
+            // উইথড্রল প্রসেস (যদি উপরের সব শর্ত পূরণ হয়)
             const withdrawal = { amount, paymentMethod, mobileNumber, paymentId, status: 'pending', requestedAt: new Date().toISOString(), processedAt: null };
             await db.collection('users').doc(userData.telegramId).update({
                 balance: firebase.firestore.FieldValue.increment(-amount),
@@ -2423,6 +2443,7 @@
             document.getElementById('withdrawForm').reset();
             showNotification('Withdrawal request submitted', 'success');
         }
+
 
         function loadWithdrawHistory() {
             const historyList = document.getElementById('withdrawHistoryList');
