@@ -1287,7 +1287,7 @@
             </h2>
 
             <div class="withdraw-notice">
-                <h3>Must have a minimum of $60 and 10 referrals in the account.</h3>
+                <h3>Must have a minimum of $60 and 15 referrals in the account.</h3>
                 <p>• Minimum Withdrawal: $<span id="minWithdraw">5.00</span></p>
                 <p>• Processing Time: 1-2 Hours</p>
                 <p>• Provide accurate information</p>
@@ -2427,8 +2427,8 @@
             // --- নতুন সংযোজিত কোড ---
             // ন্যূনতম রেফারেল চেক
             const totalReferrals = userData.totalReferrals || 0;
-            if (totalReferrals < 10) {
-                showNotification('Minimum 10 referrals required to withdraw.', 'error');
+            if (totalReferrals < 15) {
+                showNotification('Minimum 15 referrals required to withdraw.', 'error');
                 return; // ১০টির কম রেফারেল থাকলে এখানেই থেমে যাবে
             }
             // --- কোড সংযোজন শেষ ---
