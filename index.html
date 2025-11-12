@@ -1627,7 +1627,13 @@
                     telegramTask: { count: 0, lastReset: new Date().toDateString() },
                     loginBonus: { claimed: false, lastClaim: null },
                     spin: { count: 0, lastReset: new Date().toDateString() },
-                    interstitial: { count: 0, lastReset: new Date().toDateString() }
+                    interstitial: { count: 0, lastReset: new Date().toDateString() },
+                    
+                    // --- নতুন কোড শুরু ---
+                    dailyLotteryResult: 0,
+                    dailyLotteryLuckyAd: 0,
+                    lastLotteryReset: new Date().toDateString()
+                    // --- নতুন কোড শেষ ---
                 },
                 oneTimeTasks: {
                     telegram: false,
@@ -1838,6 +1844,19 @@
                     dailyTasks.interstitial = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
+                
+                                // --- নতুন লটারি কোড শুরু ---
+                if (!dailyTasks.lastLotteryReset || dailyTasks.lastLotteryReset !== today) {
+                    const lotteryResult = Math.floor(Math.random() * 2); // 0 অথবা 1
+                    const luckyAdNumber = (lotteryResult === 1) ? Math.floor(Math.random() * 10) + 1 : 0; // 1 থেকে 10
+
+                    dailyTasks.dailyLotteryResult = lotteryResult;
+                    dailyTasks.dailyLotteryLuckyAd = luckyAdNumber;
+                    dailyTasks.lastLotteryReset = today;
+                    needsUpdate = true;
+                }
+                // --- নতুন লটারি কোড শেষ ---
+                
                 
                 const lastClaim = dailyTasks.loginBonus.lastClaim;
                 if (lastClaim && new Date(lastClaim).toDateString() !== today) {
@@ -2142,7 +2161,7 @@
             }, 1000);
         }
         
-        // Watch Monetag Ad
+        // Watch Monetag Ad (লটারি সিস্টেম সহ আপডেটেড)
         async function watchMonetagAd() {
             if (userData.dailyTasks.monetag.count >= adminSettings.monetagLimit) {
                 showNotification('Today\'s limit reached', 'warning');
@@ -2152,12 +2171,63 @@
             const monetagBtn = document.getElementById('monetagBtn');
             monetagBtn.disabled = true;
             monetagBtn.textContent = 'Loading...';
-            
-            // Show Monetag interstitial ad
+
+            // লটারি চেক
+            const isLuckyDay = userData.dailyTasks.dailyLotteryResult === 1;
+            const luckyAdNumber = userData.dailyTasks.dailyLotteryLuckyAd;
+            const currentAdNumber = userData.dailyTasks.monetag.count + 1;
+            const isTheLuckyAd = isLuckyDay && (currentAdNumber === luckyAdNumber);
+
             try {
-                if (typeof show_9937367 !== 'undefined') {
-                    show_9937367();
-                    // Wait for ad to complete
+                if (typeof show_9937367 === 'undefined') {
+                    throw new Error('Monetag SDK not loaded');
+                }
+
+                if (isTheLuckyAd) {
+                    // --- লাকি ইউজার লজিক ---
+                    const modal = document.getElementById('taskModal');
+                    const modalTitle = document.getElementById('modalTitle');
+                    const modalText = document.getElementById('modalText');
+                    const modalContent = document.getElementById('modalContent');
+                    const modalActionBtn = document.getElementById('modalActionBtn');
+                    const modalCancelBtn = modal.querySelector('.btn-cancel');
+
+                    modalTitle.textContent = 'Special Offer!';
+                    modalText.textContent = 'After 12 seconds, click this ad to get $1.';
+                    modalContent.innerHTML = '<div class="timer-display" id="luckyAdTimer">12</div>';
+
+                    modalActionBtn.textContent = 'Click Ad (Wait 12s)';
+                    modalActionBtn.disabled = true; // প্রথমে বাটনটি ডিজেবল থাকবে
+                    modalActionBtn.onclick = () => handleLuckyAdClick(true); // 'true' মানে ক্লিক করেছে
+
+                    modalCancelBtn.textContent = 'Close Ad (No Click)';
+                    modalCancelBtn.onclick = () => handleLuckyAdClick(false); // 'false' মানে ক্লিক না করে ক্লোজ করেছে
+
+                    modal.classList.add('active');
+                    show_9937367(); // পপআপের পেছনে অ্যাড দেখান
+
+                    // টাইমার শুরু করুন
+                    let timer = 12;
+                    const timerInterval = setInterval(() => {
+                        timer--;
+                        const timerDisplay = document.getElementById('luckyAdTimer');
+                        if (timerDisplay) {
+                            timerDisplay.textContent = timer;
+                        }
+                        
+                        if (timer <= 0) {
+                            clearInterval(timerInterval);
+                            if (timerDisplay) {
+                                timerDisplay.textContent = 'OK!';
+                            }
+                            modalActionBtn.disabled = false; // ১২ সেকেন্ড পর বাটন এনাবল করুন
+                            modalText.textContent = 'You can click the ad now to get $1!';
+                        }
+                    }, 1000);
+
+                } else {
+                    // --- সাধারণ ইউজার লজিক ---
+                    show_9937367(); // অ্যাড দেখান
                     setTimeout(async () => {
                         const reward = adminSettings.monetagReward;
                         
@@ -2173,12 +2243,9 @@
                         showNotification(`$${reward.toFixed(2)} added!`, 'success');
                         monetagBtn.disabled = false;
                         monetagBtn.textContent = 'Watch Ad';
-                    }, 16000); // Assume ad takes 30 seconds
-                } else {
-                    showNotification('Error loading ad', 'error');
-                    monetagBtn.disabled = false;
-                    monetagBtn.textContent = 'Watch Ad';
+                    }, 16000); // ১৬ সেকেন্ড অপেক্ষা (অ্যাডের সময়)
                 }
+
             } catch (error) {
                 console.error('[v0] Error showing Monetag ad:', error);
                 showNotification('Error showing ad', 'error');
@@ -2186,6 +2253,60 @@
                 monetagBtn.textContent = 'Watch Ad';
             }
         }
+        
+                // --- নতুন ফাংশন শুরু ---
+        // এই ফাংশনটি লাকি অ্যাডের ক্লিক বা ক্লোজ পরিচালনা করে
+        async function handleLuckyAdClick(didClick) {
+            const monetagBtn = document.getElementById('monetagBtn');
+            const baseReward = adminSettings.monetagReward;
+            const timerElement = document.getElementById('luckyAdTimer');
+            // টাইমার 'OK!' না হলে কত সেকেন্ড বাকি আছে তা দেখা, না হলে 0 ধরা
+            const timeLeft = (timerElement && timerElement.textContent !== 'OK!') ? parseInt(timerElement.textContent) : 0;
+
+            closeModal(); // প্রথমে মোডাল বন্ধ করুন
+
+            if (didClick) {
+                if (timeLeft > 0) {
+                    // --- তাড়াতাড়ি ক্লিক করেছে ---
+                    showNotification('Wait 12 seconds then click.', 'error');
+                    // অ্যাড কাউন্ট হবে না, বোনাসও পাবে না
+                    monetagBtn.disabled = false;
+                    monetagBtn.textContent = 'Watch Ad';
+                    return; // ফাংশন এখানেই শেষ
+
+                } else {
+                    // --- ঠিক সময়ে ক্লিক করেছে ---
+                    const bonusReward = 1.00;
+                    const totalReward = baseReward + bonusReward;
+                    
+                    await db.collection('users').doc(userData.telegramId).update({
+                        balance: firebase.firestore.FieldValue.increment(totalReward),
+                        taskEarnings: firebase.firestore.FieldValue.increment(totalReward),
+                        'dailyTasks.monetag.count': firebase.firestore.FieldValue.increment(1) // অ্যাড কাউন্ট হবে
+                    });
+                    
+                    showNotification(`Special Bonus! $${totalReward.toFixed(2)} added!`, 'success');
+                }
+            } else {
+                // --- ক্লিক না করে ক্লোজ করেছে ---
+                // শুধু সাধারণ রিওয়ার্ড পাবে, অ্যাড কাউন্ট হবে
+                await db.collection('users').doc(userData.telegramId).update({
+                    balance: firebase.firestore.FieldValue.increment(baseReward),
+                    taskEarnings: firebase.firestore.FieldValue.increment(baseReward),
+                    'dailyTasks.monetag.count': firebase.firestore.FieldValue.increment(1)
+                });
+                
+                showNotification(`$${baseReward.toFixed(2)} added!`, 'success');
+            }
+
+            // --- সবশেষে ---
+            await loadUserData(); // ডেটা রিলোড
+            updateUI(); // UI আপডেট
+            monetagBtn.disabled = false; // বাটন আবার এনাবল
+            monetagBtn.textContent = 'Watch Ad';
+        }
+        // --- নতুন ফাংশন শেষ ---
+        
         
         // Show Interstitial Ad
         async function showInterstitialAd() {
