@@ -6,978 +6,161 @@
     <title>Cat Fire - Earn Money</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- Firebase and Monetag Scripts (Original) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <script src='//libtl.com/sdk.js' data-zone='9937367' data-sdk='show_9937367'></script>
-    <style>
-  #vpnWarning {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000000ee;
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 2rem;
-    text-align: center;
-    padding-top: 20%;
-    z-index: 999999;
-  }
-</style>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    
+    <!-- Tailwind CSS (For Premium Design) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- *** NEW PREMIUM STYLES AND ANIMATIONS *** -->
+    <style>
         :root {
-            --primary-color: #3B82F6;
-            --secondary-color: #1E40AF;
-            --success-color: #10B981;
-            --danger-color: #EF4444;
-            --warning-color: #F59E0B;
-            --dark-bg: #F8FAFC;
-            --card-bg: #FFFFFF;
-            --text-primary: #1F2937;
-            --text-secondary: #6B7280;
-            --border-color: #E5E7EB;
-            --verified-color: #06B6D4;
+            --bg-dark: #0F172A; /* Premium Dark Blue */
+            --card-dark: #1E293B; /* Slate 800 */
+            --primary-glow: #2563EB; /* Bright Blue */
+            --secondary-glow: #9333EA; /* Purple */
+            --text-light: #E2E8F0; /* Slate 200 */
+            --text-dim: #94A3B8; /* Slate 400 */
+            --success: #10B981; /* Green */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #F0F9FF 0%, #F8FAFC 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding-bottom: 140px;
-        }
-        
-        .blue-tick {
-            color: var(--verified-color);
-            margin-left: 5px;
-            font-size: 16px;
-            display: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden; /* Hide horizontal scroll */
         }
 
-        .task-locked {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* Header */
-        .header {
-            margin-top: 3px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            padding: 20px;
-            text-align: center;
-            border-bottom: none;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: white;
-            background: none;
-            -webkit-text-fill-color: unset;
-        }
-
-        .user-info {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        /* Balance Card */
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            margin: 20px;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
-            color: white;
-        }
-
-        /* Task Cards */
-        .task-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
-            border-color: var(--primary-color);
-        }
-
-        .task-reward {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        /* Verification Card */
-        .verification-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px;
-            text-align: center;
-            border: 2px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .verification-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .verification-btn.verified {
-            background: var(--success-color);
-            cursor: default;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            color: var(--text-secondary);
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-        }
-
-        /* Profile Header */
-        .profile-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            border-radius: 0 0 20px 20px;
-        }
-
-        .profile-avatar {
-            background: rgba(255, 255, 255, 0.2);
-            border: 3px solid white;
-        }
-
-        /* Stat Cards */
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-value {
-            color: var(--primary-color);
-        }
-
-        /* Referral Card */
-        .referral-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-        }
-
-        /* Form Elements */
-        .form-input, .form-select {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .form-input:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Withdraw Notice */
-        .withdraw-notice {
-            background: var(--card-bg);
-            border-left: 4px solid var(--primary-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        /* History Items */
-        .history-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-
-        .withdrawer-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-
-        .withdrawer-rank {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        /* Modal */
-        .modal {
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Notifications */
-        .notification {
-            background: var(--card-bg);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .notification.success {
-            border-left: 4px solid var(--success-color);
-        }
-
-        .notification.error {
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .notification.warning {
-            border-left: 4px solid var(--warning-color);
-        }
-
-
-        /* --- START: Added for Button Fixes --- */
-        .modal-actions {
-            display: flex;
-            flex-direction: column; /* বাটনগুলি নিচে নিচে দেখাবে */
-            gap: 10px;
-            margin-top: 20px; 
-        }
-        .btn { /* সব বাটনের জন্য সাধারণ স্টাইল */
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%; 
-        }
-        .btn-cancel {
-            background: var(--border-color); /* হালকা ধূসর রঙ */
-            color: var(--text-primary);
-        }
-        .btn-cancel:hover {
-            background: #d1d5db; /* হোভারে গাঢ় ধূসর */
-        }
-        
-        .btn-task-link {
-            background: var(--success-color); /* সবুজ রঙ */
-            color: white;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-        .btn-task-link:hover {
-            background: #059669; /* হোভারে গাঢ় সবুজ */
-        }
-
-        .btn-submit-main {
-            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%); /* সবুজ গ্র্যাডিয়েন্ট */
-            color: white;
-            width: 100%;
-            padding: 14px; /* বাটনটি একটু বড় করা হলো */
-        }
-        .btn-submit-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        /* --- END: Added for Button Fixes --- */
-
-
-
-        /* Welcome Modal */
-        .welcome-modal {
-            display: none;
+        /* --- Particle Canvas (PREMIUM ANIMATION) --- */
+        #particleCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
+            z-index: -1; /* Behind everything */
+            opacity: 0.5;
         }
 
-        .welcome-modal.active {
-            display: flex;
+        /* --- Page Animations --- */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
         }
-
-        .welcome-content {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            margin: 20px;
-            animation: slideIn 0.5s ease;
+        .page.active {
+            display: block;
         }
-
-        @keyframes slideIn {
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
             from {
-                transform: translateY(-50px);
                 opacity: 0;
+                transform: translateY(20px);
             }
             to {
-                transform: translateY(0);
                 opacity: 1;
+                transform: translateY(0);
             }
         }
-
-        .welcome-content h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
         }
 
-        .welcome-content p {
-            font-size: 16px;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .welcome-btn {
-            background: white;
-            color: var(--primary-color);
-            border: none;
-            padding: 12px 40px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .welcome-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Loading Screen */
+        /* --- Loader Screen (Restyled) --- */
         .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--dark-bg);
+            background: var(--bg-dark);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9998;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
-
         .loading-screen.hidden {
-            display: none;
+            opacity: 0;
+            pointer-events: none;
         }
-
         .loader {
             width: 50px;
             height: 50px;
-            border: 5px solid var(--border-color);
-            border-top: 5px solid var(--primary-color);
+            border: 5px solid var(--card-dark);
+            border-top: 5px solid var(--primary-glow);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Task Sections */
-        .task-section {
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-icon {
-            font-size: 24px;
-        }
-
-        /* Task Progress */
-        .task-progress {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--dark-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            transition: width 0.3s;
-        }
-
-        /* Task Buttons */
-        .task-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .task-btn.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        /* --- VPN Warning (Restyled) --- */
+        #vpnWarning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
             color: white;
+            font-family: Arial, sans-serif;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 20% 1rem;
+            z-index: 999999;
+            backdrop-filter: blur(5px);
         }
 
-        .task-btn.completed {
-            background: var(--success-color);
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .task-btn.disabled {
-            background: var(--border-color);
-            color: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        /* Spin Wheel */
-        .spin-container {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .spin-wheel {
-            width: 300px;
-            height: 300px;
-            margin: 20px auto;
-            position: relative;
-            border-radius: 50%;
-            border: 10px solid var(--primary-color);
-            overflow: hidden;
-        }
-
-        .spin-wheel canvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        .spin-pointer {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--primary-color);
-            z-index: 10;
-        }
-
-        .spin-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .bet-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .bet-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            background: transparent;
-            color: var(--text-primary);
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .bet-btn.selected {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-color: var(--primary-color);
-        }
-
-        /* Bottom Navigation */
+        /* --- Bottom Nav (Restyled for 2 items) --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 100%;
-            background: var(--card-bg);
-            border-top: 2px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
+            right: 0;
             z-index: 1000;
+            background: rgba(15, 23, 42, 0.8); /* Dark with blur */
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--card-dark);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            padding: 10px 0;
         }
-
         .nav-item {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             padding: 10px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             border: none;
             background: transparent;
-            color: var(--text-secondary);
+            color: var(--text-dim);
         }
-
         .nav-item.active {
-            color: var(--primary-color);
+            color: var(--primary-glow);
+            transform: scale(1.1);
         }
-
         .nav-icon {
             font-size: 24px;
         }
-
         .nav-label {
             font-size: 12px;
+            font-weight: 500;
         }
 
-        /* Pages */
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* Withdraw Page */
-        .withdraw-notice {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .withdraw-notice h3 {
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-
-        .withdraw-notice p {
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-primary);
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .withdraw-history {
-            margin-top: 30px;
-        }
-
-        .history-item {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-info {
-            flex: 1;
-        }
-
-        .history-amount {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .history-status {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: var(--warning-color);
-            color: white;
-        }
-
-        .status-approved {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .status-rejected {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .top-withdrawers {
-            margin-top: 30px;
-        }
-
-        .withdrawer-item {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .withdrawer-rank {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .withdrawer-info {
-            flex: 1;
-            margin-left: 15px;
-        }
-
-        .withdrawer-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .withdrawer-amount {
-            font-size: 18px;
-            color: var(--success-color);
-            font-weight: bold;
-        }
-
-        /* Referral Page */
-        .referral-card {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .referral-title {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        .referral-description {
-            margin-bottom: 20px;
-            line-height: 1.6;
-            opacity: 0.9;
-        }
-
-        .referral-link-container {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            word-break: break-all;
-        }
-
-        .referral-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .referral-list {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        .referral-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .referral-list-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Profile Page */
-        .profile-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 40px 20px;
-            text-align: center;
-            border-radius: 0 0 30px 30px;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 48px;
-            margin: 0 auto 20px;
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .profile-username {
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .profile-id {
-            opacity: 0.8;
-            font-size: 14px;
-        }
-
-        .profile-balance {
-            background: var(--card-bg);
-            margin: 20px;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-        }
-
-        .profile-balance-label {
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        .profile-balance-amount {
-            font-size: 48px;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 0 20px;
-            margin-bottom: 20px;
-        }
-
-        .profile-stat-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        .profile-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .profile-stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .earnings-chart {
-            background: var(--card-bg);
-            margin: 0 20px 20px;
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        .chart-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .chart-container {
-            height: 200px;
-            position: relative;
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            z-index: 10002;
-            animation: slideInRight 0.3s ease;
-            max-width: 300px;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .notification.success {
-            border-left: 4px solid var(--success-color);
-        }
-
-        .notification.error {
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .notification.warning {
-            border-left: 4px solid var(--warning-color);
-        }
-
-        /* Modal */
+        /* --- Modal (Restyled) --- */
         .modal {
             display: none;
             position: fixed;
@@ -986,304 +169,343 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
+            z-index: 9990;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
         }
-
         .modal.active {
             display: flex;
         }
-
         .modal-content {
-            background: var(--card-bg);
-            padding: 30px;
+            background: var(--card-dark);
+            padding: 24px;
             border-radius: 20px;
             max-width: 400px;
             margin: 20px;
             text-align: center;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.4s ease-out;
         }
-
         .modal-title {
             font-size: 24px;
+            font-weight: 700;
             margin-bottom: 15px;
+            color: var(--text-light);
         }
-
         .modal-text {
-            color: var(--text-secondary);
+            color: var(--text-dim);
             margin-bottom: 20px;
             line-height: 1.6;
         }
-
         .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Timer Display */
-        .timer-display {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 20px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
         }
         
-        
-        /* Bonus Ad Modal Timer */
-#bonusAdModalContent .timer-display {
-    font-size: 60px;
-    font-weight: bold;
-    color: var(--danger-color);
-    margin: 20px 0;
-}
-
-#bonusAdModalContent .timer-display.go {
-    color: var(--success-color);
-}
-
-        /* Hide timer popup completely */
-        .timer-hidden {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-        }
-
-        /* YouTube Video Container */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* --- Premium Button Styles --- */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             width: 100%;
-            height: 100%;
+            display: block;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-
-        .code-input-group {
-            display: flex;
-            gap: 10px;
+        .btn-primary {
+            background-image: linear-gradient(to right, var(--primary-glow) 0%, var(--secondary-glow) 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(147, 51, 234, 0.3);
+        }
+        .btn-cancel {
+            background: #334155; /* Slate 700 */
+            color: var(--text-light);
+        }
+        .btn-cancel:hover {
+            background: #475569; /* Slate 600 */
+        }
+        .btn-submit-main { /* For Withdraw */
+            background-image: linear-gradient(to right, var(--success) 0%, #059669 100%);
+            color: white;
+        }
+        .btn-submit-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(16, 185, 129, 0.3);
+        }
+        .btn-task-link { /* For Modals */
+            background: var(--success);
+            color: white;
             margin-bottom: 15px;
         }
 
-        .code-input {
-            flex: 1;
+        /* --- Form Inputs (Restyled) --- */
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #334155; /* Slate 700 */
+            background: #0F172A; /* Dark bg */
+            color: var(--text-light);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .balance-amount {
-                font-size: 36px;
-            }
-
-            .spin-wheel {
-                width: 250px;
-                height: 250px;
-            }
-
-            .profile-stats {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        /* --- Task Button States --- */
+        .task-btn.completed {
+            background: var(--success);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .task-btn.disabled {
+            background: #334155;
+            color: var(--text-dim);
+            cursor: not-allowed;
+            opacity: 0.5;
         }
 
-        @media (max-width: 480px) {
-            .referral-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .balance-actions {
-                flex-direction: column;
-            }
+        /* Blue Tick */
+        .blue-tick {
+            color: #38BDF8; /* Light Blue */
+            margin-left: 5px;
+            font-size: 16px;
+            display: none;
         }
+        
+        /* Task Locking */
+        .task-locked {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: blur(2px);
+        }
+
+        /* Bonus Ad Timer */
+        #bonusAdModalContent .timer-display {
+            font-size: 60px;
+            font-weight: 700;
+            color: var(--danger-color);
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+        #bonusAdModalContent .timer-display.go {
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        
     </style>
 </head>
-<body>
+<body class="pb-24">
+    
+    <!-- Premium Particle Background -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Loading Screen (Original, Restyled) -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
     </div>
 
+    <!-- VPN Warning (Original, Restyled) -->
     <div class="vpn-warning" id="vpnWarning">
         <div class="vpn-content">
-            <div class="vpn-icon">⚠️</div>
-            <h2>VPN Detected!</h2>
+            <div class="vpn-icon text-5xl mb-4">⚠️</div>
+            <h2 class="text-3xl font-bold mb-2">VPN Detected!</h2>
             <p>Your VPN is active. Please turn off your VPN and refresh the page to use this app.</p>
         </div>
     </div>
 
-    <div class="welcome-modal" id="welcomeModal">
-        <div class="welcome-content">
-            <h2>Welcome! 🎉</h2>
-            <p id="welcomeMessage">Welcome to Cat Fire! Complete tasks and earn money.</p>
-            <button class="welcome-btn" onclick="closeWelcomeModal()">Get Started</button>
+    <!-- Welcome Modal (Original, Restyled) -->
+    <div class="welcome-modal modal" id="welcomeModal">
+        <div class="welcome-content modal-content" style="background-image: linear-gradient(to right, var(--primary-glow) 0%, var(--secondary-glow) 100%);">
+            <h2 class="modal-title text-white">Welcome! 🎉</h2>
+            <p id="welcomeMessage" class="modal-text text-gray-200">Welcome to Cat Fire! Complete tasks and earn money.</p>
+            <button class="btn" style="background: white; color: var(--primary-glow); font-weight: 700;" onclick="closeWelcomeModal()">Get Started</button>
         </div>
     </div>
 
-    <div class="header">
-        <h1>🔥 Cat Fire</h1>
-        <div class="user-info">
-            <span id="userName">Loading...</span><span class="blue-tick" id="blueTick">✔</span>
-            <span>•</span>
-            <span id="userId">ID: ...</span>
+    <!-- NEW Header -->
+    <header class="sticky top-0 z-50 p-4 bg-gray-900/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                🔥 Cat Fire
+            </h1>
+            <div class="user-info text-right text-sm">
+                <div class="font-semibold text-white">
+                    <span id="userName">Loading...</span><span class="blue-tick" id="blueTick">✔</span>
+                </div>
+                <div class="text-xs text-gray-400" id="userId">ID: ...</div>
+            </div>
         </div>
-    </div>
+    </header>
 
+    <!-- PAGE 1: HOME (Restyled) -->
     <div class="page active" id="homePage">
-        <div class="balance-card">
-            <div class="balance-label">Your Balance</div>
-            <div class="balance-amount">$<span id="userBalance">0.00</span></div>
-            <div class="balance-actions">
-                <button class="btn btn-primary" onclick="showPage('withdrawPage', document.querySelector('.nav-item[onclick*=\'withdrawPage\']'))">
-                    💰 Withdraw
-                </button>
-                <button class="btn btn-secondary" onclick="refreshBalance()">
-                    🔄 Refresh
-                </button>
-            </div>
-        </div>
-        
-        <div class="container">
+        <div class="container mx-auto p-4">
 
-            <div class="verification-card" id="verificationContainer">
-                <h2 class="section-title" style="justify-content: center;">Account Verification</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 20px;">Verify your account to unlock all tasks and features.</p>
-                <button class="verification-btn" id="verificationBtn" onclick="verifyAccount()">Verify</button>
+            <!-- Balance Card -->
+            <div class="balance-card bg-gradient-to-br from-blue-600 to-purple-600 p-6 rounded-2xl shadow-xl text-white mb-6 fade-in-up" style="animation-delay: 100ms;">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-lg font-light opacity-90">Your Balance</span>
+                    <button class="text-2xl transform transition-transform duration-300 active:rotate-180" onclick="refreshBalance()">
+                        🔄
+                    </button>
+                </div>
+                <div class="text-5xl font-bold mb-6">$<span id="userBalance">0.00</span></div>
+                <div class="balance-actions">
+                    <button class="btn" style="background: rgba(255,255,255,0.9); color: var(--primary-glow); font-weight: 700;" onclick="showPage('withdrawPage', document.querySelector('.nav-item[onclick*=\'withdrawPage\']'))">
+                        💰 Withdraw
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Verification Card -->
+            <div class="verification-card bg-gray-800 p-5 rounded-2xl shadow-lg text-center mb-6 fade-in-up" id="verificationContainer" style="animation-delay: 200ms;">
+                <h2 class="text-xl font-semibold mb-2">Account Verification</h2>
+                <p class="text-gray-400 mb-4 text-sm">Verify your account to unlock all tasks and features.</p>
+                <button class="btn btn-primary verification-btn w-auto px-8 inline-block" id="verificationBtn" onclick="verifyAccount()">Verify</button>
             </div>
 
-            <div class="task-section task-locked" id="allTasks">
-                <div class="task-section">
-                    <h2 class="section-title">
-                        <span class="section-icon">📋</span>
-                        Daily Tasks
+            <!-- Task List -->
+            <div class="task-section fade-in-up" id="allTasks" style="animation-delay: 300ms;">
+                
+                <!-- Daily Tasks -->
+                <div class="task-section mb-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="text-2xl">📋</span> Daily Tasks
                     </h2>
 
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">📺 Watch Rewarded Ad</div>
-                            <div class="task-reward">$<span id="monetagReward">0.05</span></div>
+                    <!-- Task Cards (Restyled) -->
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--primary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">📺 Watch Rewarded Ad</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="monetagReward">0.05</span></div>
                         </div>
-                        <div class="task-description">
-                            Watch ads to earn rewards
+                        <p class="text-gray-400 text-sm mb-4">Watch ads to earn rewards</p>
+                        <div class="task-progress mb-4">
+                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Today's Progress</span>
+                                <span><span id="monetagCount">0</span>/<span id="monetagLimit">10</span></span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" id="monetagProgress" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <div class="task-progress">
-                            <span>Today's Progress</span>
-                            <span><span id="monetagCount">0</span>/<span id="monetagLimit">10</span></span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="monetagProgress" style="width: 0%"></div>
-                        </div>
-                        <button class="task-btn active" id="monetagBtn" onclick="watchMonetagAd()">
+                        <button class="btn btn-primary task-btn active" id="monetagBtn" onclick="watchMonetagAd()">
                             Watch Ad
                         </button>
                     </div>
 
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">🔗 Visit Direct Link</div>
-                            <div class="task-reward">$<span id="directLinkReward">0.30</span></div>
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--primary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">🔗 Visit Direct Link</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="directLinkReward">0.30</span></div>
                         </div>
-                        <div class="task-description">
-                            Visit link and stay for the required time
+                        <p class="text-gray-400 text-sm mb-4">Visit link and stay for the required time</p>
+                        <div class="task-progress mb-4">
+                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Progress</span>
+                                <span><span id="directLinkCount">0</span>/3</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" id="directLinkProgress" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <div class="task-progress">
-                            <span>Today's Progress</span>
-                            <span><span id="directLinkCount">0</span>/3</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="directLinkProgress" style="width: 0%"></div>
-                        </div>
-                        <button class="task-btn active" id="directLinkBtn" onclick="visitDirectLink()">
+                        <button class="btn btn-primary task-btn active" id="directLinkBtn" onclick="visitDirectLink()">
                             Visit Link
                         </button>
                     </div>
 
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">🧾Find the code </div>
-                            <div class="task-reward">$<span id="youtubeReward">0.15</span></div>
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--primary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">🧾 Find the code</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="youtubeReward">0.15</span></div>
                         </div>
-                        <div class="task-description">
-                            Visit the website and collect the code.
+                        <p class="text-gray-400 text-sm mb-4">Visit the website and collect the code.</p>
+                        <div class="task-progress mb-4">
+                           <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Progress</span>
+                                <span><span id="youtubeCount">0</span>/3</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" id="youtubeProgress" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <div class="task-progress">
-                            <span>Today's Progress</span>
-                            <span><span id="youtubeCount">0</span>/3</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="youtubeProgress" style="width: 0%"></div>
-                        </div>
-                        <button class="task-btn active" id="youtubeBtn" onclick="watchYoutubeVideo()">
+                        <button class="btn btn-primary task-btn active" id="youtubeBtn" onclick="watchYoutubeVideo()">
                             Visit website
                         </button>
                     </div>
                     
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">📱 Complete Telegram Task</div>
-                            <div class="task-reward">$<span id="telegramTaskReward">0.15</span></div>
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--primary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">📱 Complete Telegram Task</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="telegramTaskReward">0.15</span></div>
                         </div>
-                        <div class="task-description">
-                           Join our channel and get the code to earn rewards.
+                        <p class="text-gray-400 text-sm mb-4">Join our channel and get the code to earn rewards.</p>
+                         <div class="task-progress mb-4">
+                           <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span>Progress</span>
+                                <span><span id="telegramTaskCount">0</span>/3</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" id="telegramTaskProgress" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <div class="task-progress">
-                            <span>Today's Progress</span>
-                            <span><span id="telegramTaskCount">0</span>/3</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="telegramTaskProgress" style="width: 0%"></div>
-                        </div>
-                        <button class="task-btn active" id="telegramTaskBtn" onclick="doTelegramTask()">
+                        <button class="btn btn-primary task-btn active" id="telegramTaskBtn" onclick="doTelegramTask()">
                             Start Task
                         </button>
                     </div>
 
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">🎁 Daily Login Bonus</div>
-                            <div class="task-reward">$<span id="loginBonusReward">0.20</span></div>
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--success);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">🎁 Daily Login Bonus</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="loginBonusReward">0.20</span></div>
                         </div>
-                        <div class="task-description">
-                            Login daily and get bonus
-                        </div>
-                        <button class="task-btn active" id="loginBonusBtn" onclick="claimLoginBonus()">
+                        <p class="text-gray-400 text-sm mb-4">Login daily and get bonus</p>
+                        <button class="btn btn-submit-main task-btn active" id="loginBonusBtn" onclick="claimLoginBonus()">
                             Claim Now
                         </button>
                     </div>
                 </div>
 
+                <!-- One-Time Tasks -->
                 <div class="task-section">
-                    <h2 class="section-title">
-                        <span class="section-icon">⭐</span>
-                        One-Time Tasks
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="text-2xl">⭐</span> One-Time Tasks
                     </h2>
-
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">📢 Join Telegram Channel</div>
-                            <div class="task-reward">$<span id="telegramBonusReward">0.50</span></div>
+                    
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--secondary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">📢 Join Telegram Channel</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="telegramBonusReward">0.50</span></div>
                         </div>
-                        <div class="task-description">
-                            Join our Telegram channel
-                        </div>
-                        <button class="task-btn active" id="telegramBtn" onclick="joinTelegramChannel()">
+                        <p class="text-gray-400 text-sm mb-4">Join our Telegram channel</p>
+                        <button class="btn btn-primary task-btn active" id="telegramBtn" onclick="joinTelegramChannel()" style="background-image: linear-gradient(to right, #f59e0b 0%, #ef4444 100%);">
                             Join Now
                         </button>
                     </div>
 
-                    <div class="task-card">
-                        <div class="task-header">
-                            <div class="task-title">▶️ Subscribe YouTube</div>
-                            <div class="task-reward">$<span id="youtubeSubBonusReward">0.50</span></div>
+                    <div class="task-card bg-gray-800 p-5 rounded-2xl shadow-lg mb-4" style="border-left: 4px solid var(--secondary-glow);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">▶️ Subscribe YouTube</h3>
+                            <div class="task-reward text-lg font-bold text-cyan-400">$<span id="youtubeSubBonusReward">0.50</span></div>
                         </div>
-                        <div class="task-description">
-                            Subscribe to our YouTube channel
-                        </div>
-                        <button class="task-btn active" id="youtubeSubBtn" onclick="subscribeYoutube()">
+                        <p class="text-gray-400 text-sm mb-4">Subscribe to our YouTube channel</p>
+                        <button class="btn btn-primary task-btn active" id="youtubeSubBtn" onclick="subscribeYoutube()" style="background-image: linear-gradient(to right, #f59e0b 0%, #ef4444 100%);">
                             Subscribe
                         </button>
                     </div>
@@ -1292,173 +514,117 @@
         </div>
     </div>
 
+    <!-- PAGE 2: WITHDRAW + REFER (Restyled) -->
     <div class="page" id="withdrawPage">
-        <div class="container">
-            <!-- *** START: Referral Content Added *** -->
-            <h2 class="section-title" style="margin-top: 20px;">
-                <span class="section-icon">🎁</span>
-                Refer & Earn
+        <div class="container mx-auto p-4">
+
+            <!-- Referral Section -->
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="text-3xl">🎁</span> Refer & Earn
             </h2>
-            <div class="referral-card">
-                <h2 class="referral-title">🎁 Earn by Referring</h2>
-                <p class="referral-description">
-                    Invite your friends and get $<span id="referralBonus">1.00</span> for each referral! 
-                    Your friend will also get a bonus of $<span id="referredBonus">2.00</span>.
+            <div class="referral-card bg-gradient-to-br from-purple-600 to-indigo-700 p-6 rounded-2xl shadow-xl text-white text-center mb-6">
+                <h2 class="text-2xl font-bold mb-3">Earn by Referring</h2>
+                <p class="mb-4 opacity-90 text-sm">
+                    Invite friends and get $<span id="referralBonus">1.00</span>! 
+                    Your friend gets $<span id="referredBonus">2.00</span>.
                 </p>
-                <div class="referral-link-container" id="referralLink">
+                <div class="referral-link-container bg-black bg-opacity-20 p-3 rounded-lg mb-4 text-sm break-all" id="referralLink">
                     Loading...
                 </div>
-                <div class="referral-actions">
-                    <button class="btn btn-primary" onclick="copyReferralLink()">
+                <div class="referral-actions grid grid-cols-2 gap-3">
+                    <button class="btn" style="background: rgba(255,255,255,0.9); color: var(--secondary-glow); font-weight: 700;" onclick="copyReferralLink()">
                         📋 Copy Link
                     </button>
-                    <button class="btn btn-secondary" onclick="shareReferralLink()">
+                    <button class="btn" style="background: transparent; border: 2px solid white; color: white;" onclick="shareReferralLink()">
                         📤 Share Link
                     </button>
                 </div>
             </div>
 
-            <div class="referral-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalReferrals">0</div>
-                    <div class="stat-label">Total Referrals</div>
+            <div class="referral-stats grid grid-cols-2 gap-4 mb-6">
+                <div class="stat-card bg-gray-800 p-4 rounded-2xl text-center shadow-lg">
+                    <div class="stat-value text-3xl font-bold text-purple-400" id="totalReferrals">0</div>
+                    <div class="stat-label text-sm text-gray-400">Total Referrals</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">$<span id="referralEarnings">0.00</span></div>
-                    <div class="stat-label">Referral Earnings</div>
+                <div class="stat-card bg-gray-800 p-4 rounded-2xl text-center shadow-lg">
+                    <div class="stat-value text-3xl font-bold text-green-400">$<span id="referralEarnings">0.00</span></div>
+                    <div class="stat-label text-sm text-gray-400">Referral Earnings</div>
                 </div>
             </div>
 
-            <div class="referral-list">
-                <h3 class="section-title">
-                    <span class="section-icon">👥</span>
-                    Your Referrals
+            <div class="referral-list bg-gray-800 p-5 rounded-2xl shadow-lg mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-white">
+                    <span class="text-xl mr-2">👥</span> Your Referrals
                 </h3>
-                <div id="referralListContainer">
-                    <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        No referrals yet
-                    </p>
+                <div id="referralListContainer" class="max-h-48 overflow-y-auto space-y-2">
+                    <p class="text-center text-gray-500 p-4">No referrals yet</p>
                 </div>
             </div>
             
-            <hr style="border-top: 2px solid var(--border-color); margin: 30px 0;">
-            <!-- *** END: Referral Content Added *** -->
+            <!-- Divider -->
+            <hr class="border-t-2 border-gray-700 my-8">
 
-            <h2 class="section-title">
-                <span class="section-icon">💰</span>
-                Withdraw
+            <!-- Withdraw Section -->
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span class="text-3xl">💰</span> Withdraw
             </h2>
 
-            <div class="withdraw-notice">
-                <h3>Must have a minimum of $60 and 15 referrals in the account.</h3>
+            <div class="withdraw-notice bg-blue-900/50 border-l-4 border-blue-500 text-blue-200 p-4 rounded-lg mb-6 text-sm">
+                <h3 class="font-bold mb-2">Withdrawal Rules</h3>
+                <p>• Must have a minimum of $60 and 15 referrals in the account.</p>
                 <p>• Minimum Withdrawal: $<span id="minWithdraw">5.00</span></p>
                 <p>• Processing Time: 1-2 Hours</p>
-                <p>• Provide accurate information</p>
             </div>
 
-            <form id="withdrawForm" onsubmit="submitWithdraw(event)">
+            <form id="withdrawForm" onsubmit="submitWithdraw(event)" class="bg-gray-800 p-5 rounded-2xl shadow-lg space-y-4 mb-6">
                 <div class="form-group">
-                    <label class="form-label">Withdrawal Amount ($)</label>
+                    <label class="form-label block mb-1.5 font-medium text-gray-300" for="withdrawAmount">Amount ($)</label>
                     <input type="number" class="form-input" id="withdrawAmount" step="0.01" min="0" required placeholder="e.g., 10.00">
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label">Payment Method</label>
+                    <label class="form-label block mb-1.5 font-medium text-gray-300" for="paymentMethod">Payment Method</label>
                     <select class="form-select" id="paymentMethod" required>
                         <option value="">Select Method</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label">Mobile Number</label>
+                    <label class="form-label block mb-1.5 font-medium text-gray-300" for="mobileNumber">Mobile Number</label>
                     <input type="tel" class="form-input" id="mobileNumber" required placeholder="+1...">
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label">Payment ID / Number</label>
+                    <label class="form-label block mb-1.5 font-medium text-gray-300" for="paymentId">Payment ID / Number</label>
                     <input type="text" class="form-input" id="paymentId" required placeholder="Your payment ID">
                 </div>
-
-                <button type="submit" class="btn btn-submit-main">
+                <button type="submit" class="btn btn-submit-main !mt-6">
                     Request Withdrawal
                 </button>
             </form>
 
-            <div class="withdraw-history">
-                <h3 class="section-title">
-                    <span class="section-icon">📜</span>
-                    Withdrawal History
+            <div class="withdraw-history bg-gray-800 p-5 rounded-2xl shadow-lg mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-white">
+                    <span class="text-xl mr-2">📜</span> Withdrawal History
                 </h3>
-                <div id="withdrawHistoryList">
-                    <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        No withdrawal history
-                    </p>
+                <div id="withdrawHistoryList" class="space-y-3">
+                    <p class="text-center text-gray-500 p-4">No withdrawal history</p>
                 </div>
             </div>
 
-            <div class="top-withdrawers">
-                <h3 class="section-title">
-                    <span class="section-icon">🏆</span>
-                    Top Withdrawers
+            <div class="top-withdrawers bg-gray-800 p-5 rounded-2xl shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-white">
+                    <span class="text-xl mr-2">🏆</span> Top Withdrawers
                 </h3>
-                <div id="topWithdrawersList">
-                    <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        Loading...
-                    </p>
+                <div id="topWithdrawersList" class="space-y-3">
+                    <p class="text-center text-gray-500 p-4">Loading...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- *** START: referralPage DIV REMOVED *** -->
-    <!-- <div class="page" id="referralPage"> ... </div> -->
-    <!-- *** END: referralPage DIV REMOVED *** -->
-
-    <div class="page" id="profilePage">
-        <div class="profile-header">
-            <div class="profile-avatar">👤</div>
-            <div class="profile-name" id="profileName">Loading...</div>
-            <div class="profile-username" id="profileUsername">@username</div>
-            <div class="profile-id" id="profileId">ID: ...</div>
-        </div>
-
-        <div class="profile-balance">
-            <div class="profile-balance-label">Total Balance</div>
-            <div class="profile-balance-amount">$<span id="profileBalance">0.00</span></div>
-        </div>
-
-        <div class="profile-stats">
-            <div class="profile-stat-card">
-                <div class="profile-stat-value" id="profileTaskEarnings">$0</div>
-                <div class="profile-stat-label">Task Earnings</div>
-            </div>
-            <div class="profile-stat-card">
-                <div class="profile-stat-value" id="profileGameEarnings">$0</div>
-                <div class="profile-stat-label">Game Earnings</div>
-            </div>
-            <div class="profile-stat-card">
-                <div class="profile-stat-value" id="profileReferralCount">0</div>
-                <div class="profile-stat-label">Referrals</div>
-            </div>
-        </div>
-
-        <div class="earnings-chart">
-            <h3 class="chart-title">Earnings Graph</h3>
-            <div class="chart-container">
-                <canvas id="earningsChart"></canvas>
-            </div>
-        </div>
-
-        <div class="earnings-chart">
-            <h3 class="chart-title">Referral Graph</h3>
-            <div class="chart-container">
-                <canvas id="referralChart"></canvas>
-            </div>
-        </div>
-    </div>
+    <!-- *** PROFILE PAGE DELETED *** -->
+    <!-- <div class="page" id="profilePage"> ... </div> -->
     
 
-
+    <!-- *** NEW 2-BUTTON BOTTOM NAV *** -->
     <div class="bottom-nav">
         <button class="nav-item active" onclick="showPage('homePage', this)">
             <div class="nav-icon">🏠</div>
@@ -1468,28 +634,35 @@
             <div class="nav-icon">💰</div>
             <div class="nav-label">Withdraw</div>
         </button>
-        <!-- *** START: 'Refer' Button REMOVED *** -->
-        <!--
-        <button class="nav-item" onclick="showPage('referralPage', this)">
-            <div class="nav-icon">🎁</div>
-            <div class="nav-label">Refer</div>
-        </button>
-        -->
-        <!-- *** END: 'Refer' Button REMOVED *** -->
-        <button class="nav-item" onclick="showPage('profilePage', this)">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">Profile</div>
-        </button>
+        <!-- Profile button removed -->
     </div>
 
+    <!-- Task Modal (Restyled) -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <h3 class="modal-title" id="modalTitle">Task</h3>
             <p class="modal-text" id="modalText">Loading...</p>
-            <div id="modalContent"></div>
+            <div id="modalContent" class="mb-5"></div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" id="modalActionBtn" onclick="modalAction()">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bonus Ad Modal (Restyled) -->
+    <div class="modal" id="bonusAdModal">
+        <div class="modal-content">
+            <h3 class="modal-title text-yellow-400" id="bonusAdModalTitle">Special Bonus!</h3>
+            <p class="modal-text" id="bonusAdModalText">Loading...</p>
+            <div id="bonusAdModalContent">
+                 <div class="timer-display">12</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="bonusAdModalCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="bonusAdModalActionBtn" disabled>
+                    Watch Ad
+                </button>
             </div>
         </div>
     </div>
@@ -1498,6 +671,7 @@
     ================================================================
     == ALL ORIGINAL JAVASCRIPT LOGIC IS PRESERVED BELOW ==
     == (Firebase, Monetag, Tasks, Auth, etc.) ==
+    == MODIFIED TO NOT BREAK FROM DELETED PROFILE PAGE ==
     ================================================================
     -->
     <script>
@@ -1524,8 +698,8 @@
         let adminSettings = null;
         let selectedBet = 'medium';
         let isSpinning = false;
-        let bonusAdTimerInterval = null; // নতুন পপ-আপের টাইমার কন্ট্রোল করার জন্য
-let hasShownBonusAdThisSession = false; // প্রতি লগইনে একবার দেখানোর জন্য
+        let bonusAdTimerInterval = null; 
+        let hasShownBonusAdThisSession = false;
 
 
         // VPN Detection
@@ -1539,9 +713,16 @@ let hasShownBonusAdThisSession = false; // প্রতি লগইনে এ�
                     data.org.toLowerCase().includes('proxy') ||
                     data.org.toLowerCase().includes('hosting')
                 )) {
-                    document.getElementById('vpnWarning').classList.add('active');
+                    document.getElementById('vpnWarning').style.display = 'block'; // Show warning
                     return true;
                 }
+                
+                // Second check
+                if (data.security && (data.security.vpn || data.security.proxy)) {
+                    showVPNWarning();
+                    return true;
+                }
+                
                 return false;
             } catch (error) {
                 console.log('[v0] VPN detection error:', error);
@@ -1583,9 +764,9 @@ let hasShownBonusAdThisSession = false; // প্রতি লগইনে এ�
                 initializeMonetagAds();
                 
                 // বোনাস পপ-আপ দেখানোর লজিক
-if (userData && userData.dailyTasks.bonusAd.count < 15) {
-    scheduleBonusAd();
-}
+                if (userData && (!userData.dailyTasks.bonusAd || userData.dailyTasks.bonusAd.count < 15)) {
+                    scheduleBonusAd();
+                }
 
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
@@ -1604,10 +785,12 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             try {
                 if (typeof show_9937367 !== 'undefined') {
                     // Load banner ad in the container
-                    const bannerContainer = document.getElementById('banner-ad-container');
+                    const bannerContainer = document.getElementById('banner-ad-container'); // This ID doesn't exist, which is fine.
                     if (bannerContainer) {
                         show_9937367();
                         console.log('[v0] Banner ad loaded successfully');
+                    } else {
+                        console.log('[v0] Monetag SDK ready (no banner container).');
                     }
                 } else {
                     console.log('[v0] Monetag SDK not loaded yet, retrying...');
@@ -1660,7 +843,7 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 isBlocked: false,
                 isVerified: false,
-                hasSeenWelcome: false, // <-- এই লাইনটি যোগ করা হয়েছে
+                hasSeenWelcome: false, 
                 dailyTasks: {
                     monetag: { count: 0, lastReset: new Date().toDateString() },
                     directLink: { count: 0, lastReset: new Date().toDateString() },
@@ -1865,15 +1048,21 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                 let needsUpdate = false;
                 
                 const dailyTasks = userData.dailyTasks;
-                if (dailyTasks.monetag.lastReset !== today) { 
+                
+                if (!dailyTasks) { // Safety check if dailyTasks is missing
+                    userData.dailyTasks = {};
+                    needsUpdate = true;
+                }
+                
+                if (!dailyTasks.monetag || dailyTasks.monetag.lastReset !== today) { 
                     dailyTasks.monetag = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
-                if (dailyTasks.directLink.lastReset !== today) { 
+                if (!dailyTasks.directLink || dailyTasks.directLink.lastReset !== today) { 
                     dailyTasks.directLink = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
-                if (dailyTasks.youtube.lastReset !== today) { 
+                if (!dailyTasks.youtube || dailyTasks.youtube.lastReset !== today) { 
                     dailyTasks.youtube = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
@@ -1881,7 +1070,7 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                     dailyTasks.telegramTask = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
-                if (dailyTasks.spin.lastReset !== today) { 
+                if (!dailyTasks.spin || dailyTasks.spin.lastReset !== today) { 
                     dailyTasks.spin = { count: 0, lastReset: today };
                     needsUpdate = true; 
                 }
@@ -1890,9 +1079,13 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                     needsUpdate = true; 
                 }
                 if (!dailyTasks.bonusAd || dailyTasks.bonusAd.lastReset !== today) { 
-    dailyTasks.bonusAd = { count: 0, lastReset: today };
-    needsUpdate = true; 
-}
+                    dailyTasks.bonusAd = { count: 0, lastReset: today };
+                    needsUpdate = true; 
+                }
+                if (!dailyTasks.loginBonus) {
+                    dailyTasks.loginBonus = { claimed: false, lastClaim: null };
+                    needsUpdate = true;
+                }
 
                 const lastClaim = dailyTasks.loginBonus.lastClaim;
                 if (lastClaim && new Date(lastClaim).toDateString() !== today) {
@@ -1948,21 +1141,22 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             // Verification status
             if (userData.isVerified) {
                 const verificationBtn = document.getElementById('verificationBtn');
-                verificationBtn.textContent = 'Verified';
-                verificationBtn.classList.add('verified');
-                verificationBtn.disabled = true;
+                if (verificationBtn) {
+                    verificationBtn.textContent = 'Verified';
+                    verificationBtn.classList.add('verified');
+                    verificationBtn.disabled = true;
+                }
                 
-                // --- FIX 1: ভেরিফাইড হলে ভেরিফিকেশন বক্স হাইড করুন ---
-                document.getElementById('verificationContainer').style.display = 'none'; 
-                // --- END FIX 1 ---
+                if (document.getElementById('verificationContainer')) {
+                    document.getElementById('verificationContainer').style.display = 'none'; 
+                }
 
                 document.getElementById('allTasks').classList.remove('task-locked');
                 document.getElementById('blueTick').style.display = 'inline';
             } else {
-                // --- FIX 1: ভেরিফাইড না হলে বক্স দেখান ---
-                document.getElementById('verificationContainer').style.display = 'block';
-                // --- END FIX 1 ---
-                
+                if (document.getElementById('verificationContainer')) {
+                    document.getElementById('verificationContainer').style.display = 'block';
+                }
                 document.getElementById('allTasks').classList.add('task-locked');
                 document.getElementById('blueTick').style.display = 'none';
             }
@@ -1979,10 +1173,10 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                 // Set default telegram task reward if not set
                 const telegramTaskCard = document.querySelector('.task-card:has(#telegramTaskReward)');
                 if (adminSettings.telegramTasks && adminSettings.telegramTasks.length > 0) {
-                    telegramTaskCard.style.display = 'block';
+                    if (telegramTaskCard) telegramTaskCard.style.display = 'block';
                     document.getElementById('telegramTaskReward').textContent = (adminSettings.telegramTasks[0]?.reward || 0.15).toFixed(2);
                 } else {
-                    telegramTaskCard.style.display = 'none';
+                    if (telegramTaskCard) telegramTaskCard.style.display = 'none';
                 }
 
                 document.getElementById('loginBonusReward').textContent = adminSettings.loginBonusReward.toFixed(2);
@@ -1990,7 +1184,6 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                 document.getElementById('youtubeSubBonusReward').textContent = adminSettings.youtubeSubBonusReward.toFixed(2);
                 document.getElementById('minWithdraw').textContent = adminSettings.minWithdraw.toFixed(2);
                 
-                // These IDs are now on the withdrawPage, but the logic remains the same
                 document.getElementById('referralBonus').textContent = adminSettings.referralBonus.toFixed(2);
                 document.getElementById('referredBonus').textContent = adminSettings.referredBonus.toFixed(2);
 
@@ -2007,24 +1200,22 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             updateTaskProgress();
             updateOneTimeTasks();
             
-            document.getElementById('profileName').textContent = `${userData.firstName} ${userData.lastName || ''}`;
-            document.getElementById('profileUsername').textContent = userData.username ? `@${userData.username}` : 'No username';
-            document.getElementById('profileId').textContent = `ID: ${userData.telegramId}`;
-            document.getElementById('profileBalance').textContent = userData.balance.toFixed(2);
-            document.getElementById('profileTaskEarnings').textContent = `$${userData.taskEarnings.toFixed(2)}`;
-            document.getElementById('profileGameEarnings').textContent = `$${userData.gameEarnings.toFixed(2)}`;
-            document.getElementById('profileReferralCount').textContent = userData.totalReferrals || 0;
+            // *** PROFILE PAGE UI CODE REMOVED ***
+            // (No more document.getElementById('profileName') etc.)
 
             updateReferralUI();
 
             loadReferralList();
             loadWithdrawHistory();
             loadTopWithdrawers();
-            drawEarningsChart();
-            drawReferralChart();
+            
+            // *** PROFILE PAGE CHART CODE REMOVED ***
+            // drawEarningsChart();
+            // drawReferralChart();
         }
 
         function updateTaskProgress() {
+            if (!userData.dailyTasks) return; // Safety check
             const { monetag, directLink, youtube, telegramTask, loginBonus } = userData.dailyTasks;
             const monetagLimit = adminSettings?.monetagLimit || 10;
 
@@ -2032,7 +1223,8 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('monetagProgress').style.width = `${(monetag.count / monetagLimit) * 100}%`;
             const monetagBtn = document.getElementById('monetagBtn');
             if (monetag.count >= monetagLimit) {
-                monetagBtn.classList.replace('active', 'completed');
+                monetagBtn.classList.add('completed');
+                monetagBtn.classList.remove('active');
                 monetagBtn.textContent = 'Completed';
                 monetagBtn.disabled = true;
             }
@@ -2041,7 +1233,8 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('directLinkProgress').style.width = `${(directLink.count / 3) * 100}%`;
             const directLinkBtn = document.getElementById('directLinkBtn');
             if (directLink.count >= 3) {
-                directLinkBtn.classList.replace('active', 'completed');
+                directLinkBtn.classList.add('completed');
+                directLinkBtn.classList.remove('active');
                 directLinkBtn.textContent = 'Completed';
                 directLinkBtn.disabled = true;
             }
@@ -2050,7 +1243,8 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('youtubeProgress').style.width = `${(youtube.count / 3) * 100}%`;
             const youtubeBtn = document.getElementById('youtubeBtn');
             if (youtube.count >= 3) {
-                youtubeBtn.classList.replace('active', 'completed');
+                youtubeBtn.classList.add('completed');
+                youtubeBtn.classList.remove('active');
                 youtubeBtn.textContent = 'Completed';
                 youtubeBtn.disabled = true;
             }
@@ -2060,30 +1254,35 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('telegramTaskProgress').style.width = `${(telegramTaskCount / 3) * 100}%`;
             const telegramTaskBtn = document.getElementById('telegramTaskBtn');
             if (telegramTaskCount >= 3) {
-                telegramTaskBtn.classList.replace('active', 'completed');
+                telegramTaskBtn.classList.add('completed');
+                telegramTaskBtn.classList.remove('active');
                 telegramTaskBtn.textContent = 'Completed';
                 telegramTaskBtn.disabled = true;
             }
             
             const loginBonusBtn = document.getElementById('loginBonusBtn');
             if (loginBonus.claimed) {
-                loginBonusBtn.classList.replace('active', 'completed');
+                loginBonusBtn.classList.add('completed');
+                loginBonusBtn.classList.remove('active');
                 loginBonusBtn.textContent = 'Claimed';
                 loginBonusBtn.disabled = true;
             }
         }
 
         function updateOneTimeTasks() {
+            if (!userData.oneTimeTasks) return; // Safety check
             const { telegram, youtubeSub } = userData.oneTimeTasks;
             const telegramBtn = document.getElementById('telegramBtn');
             if (telegram) {
-                telegramBtn.classList.replace('active', 'completed');
+                telegramBtn.classList.add('completed');
+                telegramBtn.classList.remove('active');
                 telegramBtn.textContent = 'Completed';
                 telegramBtn.disabled = true;
             }
             const youtubeSubBtn = document.getElementById('youtubeSubBtn');
             if (youtubeSub) {
-                youtubeSubBtn.classList.replace('active', 'completed');
+                youtubeSubBtn.classList.add('completed');
+                youtubeSubBtn.classList.remove('active');
                 youtubeSubBtn.textContent = 'Completed';
                 youtubeSubBtn.disabled = true;
             }
@@ -2120,10 +1319,10 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-            if (pageId === 'profilePage') {
-                drawEarningsChart();
-                drawReferralChart();
-            }
+            
+            // *** PROFILE PAGE LOGIC REMOVED ***
+            // if (pageId === 'profilePage') { ... }
+
              // *** ADDED: Refresh referral list when withdraw page is shown ***
             if (pageId === 'withdrawPage') {
                 loadReferralList();
@@ -2182,18 +1381,18 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             const modalText = document.getElementById('modalText');
             const modalContent = document.getElementById('modalContent');
             const modalActionBtn = document.getElementById('modalActionBtn');
-            const modalCloseBtn = modal.querySelector('.btn-secondary');
+            const modalCloseBtn = modal.querySelector('.btn-cancel'); // Use btn-cancel
             modalTitle.textContent = 'Advertisement';
             modalText.textContent = 'Watch the ad to receive your reward.';
             modalActionBtn.style.display = 'none';
             modalCloseBtn.style.display = 'none';
             let timeLeft = duration;
-            modalContent.innerHTML = `<div class="timer-display">${timeLeft}</div>`;
+            modalContent.innerHTML = `<div class="timer-display" style="font-size: 48px; font-weight: 700; color: var(--primary-glow); margin: 20px 0;">${timeLeft}</div>`;
             modal.classList.add('active');
 
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                modalContent.innerHTML = `<div class="timer-display">${timeLeft}</div>`;
+                modalContent.innerHTML = `<div class="timer-display" style="font-size: 48px; font-weight: 700; color: var(--primary-glow); margin: 20px 0;">${timeLeft}</div>`;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     modalCloseBtn.style.display = 'block';
@@ -2229,12 +1428,17 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                         });
 
                         await loadUserData();
-                        updateUI();
+                        updateUI(); // This will re-enable the button if not completed
 
                         showNotification(`$${reward.toFixed(2)} added!`, 'success');
-                        monetagBtn.disabled = false;
-                        monetagBtn.textContent = 'Watch Ad';
-                    }, 16000); // Assume ad takes 30 seconds
+                        
+                        // Fix: Manually reset button text if not completed
+                        if (userData.dailyTasks.monetag.count < adminSettings.monetagLimit) {
+                            monetagBtn.disabled = false;
+                            monetagBtn.textContent = 'Watch Ad';
+                        }
+                        
+                    }, 16000); // Assume ad takes 16 seconds
                 } else {
                     showNotification('Error loading ad', 'error');
                     monetagBtn.disabled = false;
@@ -2283,15 +1487,12 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('modalTitle').textContent = 'Visit Direct Link';
             document.getElementById('modalText').textContent = `Stay on the link for ${waitTime} seconds to earn $${linkData.reward.toFixed(2)}`;
             
-            // --- FIX 2: বাটন সেট করুন এবং দেখান ---
             document.getElementById('modalContent').innerHTML = ''; // কন্টেন্ট ক্লিয়ার করুন
             document.getElementById('modalActionBtn').textContent = 'OK';
             document.getElementById('modalActionBtn').onclick = () => { closeModal(); window.open(linkData.url, '_blank'); startDirectLinkTimer(waitTime, linkData.reward); };
             
-            // Cancel এবং OK দুটি বাটনই দেখান
             document.querySelector('#taskModal .btn-cancel').style.display = 'block';
             document.querySelector('#taskModal .btn-primary').style.display = 'block';
-            // --- END FIX 2 ---
             
             modal.classList.add('active');
         }
@@ -2325,7 +1526,6 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('modalTitle').textContent = 'Website Visit';
             document.getElementById('modalText').textContent = 'First click on the "Find the code" button and find the code, then enter the code below and click on the "Submit" button.';
             
-            // --- FIX 3: বাটনের ডিজাইন পরিবর্তন ---
             document.getElementById('modalContent').innerHTML = `
                 <button class="btn btn-task-link" onclick="window.open('${videoData.url}', '_blank')">
                     🧾 Find the code
@@ -2334,15 +1534,12 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                     <input type="text" class="form-input code-input" id="videoCode" placeholder="Enter code">
                 </div>
             `;
-            // --- END FIX 3 ---
 
             document.getElementById('modalActionBtn').textContent = 'Submit';
             document.getElementById('modalActionBtn').onclick = () => verifyVideoCode(videoData.code, videoData.reward);
 
-            // --- FIX 3.2: Cancel বাটন দেখান ---
             document.querySelector('#taskModal .btn-cancel').style.display = 'block';
             document.querySelector('#taskModal .btn-primary').style.display = 'block';
-            // --- END FIX 3.2 ---
 
             modal.classList.add('active');
         }
@@ -2368,7 +1565,6 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             document.getElementById('modalTitle').textContent = 'Telegram Task';
             document.getElementById('modalText').textContent = taskData.description;
 
-            // --- FIX 4: বাটনের ডিজাইন পরিবর্তন ---
             document.getElementById('modalContent').innerHTML = `
                 <button class="btn btn-task-link" onclick="window.open('${taskData.url}', '_blank')">
                     🔗 Go to Link
@@ -2377,15 +1573,12 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                     <input type="text" class="form-input code-input" id="telegramTaskCode" placeholder="Enter code">
                 </div>
             `;
-            // --- END FIX 4 ---
 
             document.getElementById('modalActionBtn').textContent = 'Submit';
             document.getElementById('modalActionBtn').onclick = () => verifyTelegramCode(taskData.code, taskData.reward);
             
-            // --- FIX 4.2: Cancel বাটন দেখান ---
             document.querySelector('#taskModal .btn-cancel').style.display = 'block';
             document.querySelector('#taskModal .btn-primary').style.display = 'block';
-            // --- END FIX 4.2 ---
             
             modal.classList.add('active');
         }
@@ -2467,7 +1660,7 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             }, 5000);
         }
 
-                async function submitWithdraw(event) {
+        async function submitWithdraw(event) {
             event.preventDefault();
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
             const paymentMethod = document.getElementById('paymentMethod').value;
@@ -2485,14 +1678,12 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
                 return; 
             }
 
-            // --- নতুন সংযোজিত কোড ---
             // ন্যূনতম রেফারেল চেক
             const totalReferrals = userData.totalReferrals || 0;
             if (totalReferrals < 15) {
                 showNotification('Minimum 15 referrals required to withdraw.', 'error');
                 return; // ১০টির কম রেফারেল থাকলে এখানেই থেমে যাবে
             }
-            // --- কোড সংযোজন শেষ ---
 
             // উইথড্রল প্রসেস (যদি উপরের সব শর্ত পূরণ হয়)
             const withdrawal = { amount, paymentMethod, mobileNumber, paymentId, status: 'pending', requestedAt: new Date().toISOString(), processedAt: null };
@@ -2509,71 +1700,79 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
 
         function loadWithdrawHistory() {
             const historyList = document.getElementById('withdrawHistoryList');
-            if (!userData.withdrawals || userData.withdrawals.length === 0) { historyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No withdrawal history</p>'; return; }
+            if (!userData.withdrawals || userData.withdrawals.length === 0) { historyList.innerHTML = '<p class="text-center text-gray-500 p-4">No withdrawal history</p>'; return; }
             historyList.innerHTML = '';
             [...userData.withdrawals].reverse().forEach(w => {
-                const item = document.createElement('div'); item.className = 'history-item';
-                const statusClass = w.status === 'pending' ? 'status-pending' : w.status === 'approved' ? 'status-approved' : 'status-rejected';
-                const statusText = w.status === 'pending' ? 'Pending' : w.status === 'approved' ? 'Approved' : 'Rejected';
-                item.innerHTML = `<div class="history-info"><div class="history-amount">$${w.amount.toFixed(2)}</div><div class="history-date">${new Date(w.requestedAt).toLocaleString('en-US')}</div></div><div class="history-status ${statusClass}">${statusText}</div>`;
+                const item = document.createElement('div'); 
+                item.className = 'history-item flex justify-between items-center p-3 bg-gray-700 rounded-lg';
+                
+                let statusClass, statusText;
+                if (w.status === 'pending') {
+                    statusClass = 'bg-yellow-500/20 text-yellow-400';
+                    statusText = 'Pending';
+                } else if (w.status === 'approved') {
+                    statusClass = 'bg-green-500/20 text-green-400';
+                    statusText = 'Approved';
+                } else {
+                    statusClass = 'bg-red-500/20 text-red-400';
+                    statusText = 'Rejected';
+                }
+
+                item.innerHTML = `
+                    <div class="history-info">
+                        <div class="history-amount font-bold text-lg text-white">$${w.amount.toFixed(2)}</div>
+                        <div class="history-date text-xs text-gray-400">${new Date(w.requestedAt).toLocaleString('en-US')}</div>
+                    </div>
+                    <div class="history-status ${statusClass} text-xs font-semibold px-3 py-1 rounded-full">
+                        ${statusText}
+                    </div>`;
                 historyList.appendChild(item);
             });
         }
 
         async function loadTopWithdrawers() {
             const topList = document.getElementById('topWithdrawersList');
-            if (!adminSettings.topWithdrawers || adminSettings.topWithdrawers.length === 0) { topList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No data available</p>'; return; }
+            if (!adminSettings.topWithdrawers || adminSettings.topWithdrawers.length === 0) { topList.innerHTML = '<p class="text-center text-gray-500 p-4">No data available</p>'; return; }
             topList.innerHTML = '';
             [...adminSettings.topWithdrawers].sort((a, b) => b.amount - a.amount).slice(0, 5).forEach((w, index) => {
-                const item = document.createElement('div'); item.className = 'withdrawer-item';
-                item.innerHTML = `<div class="withdrawer-rank">${index + 1}</div><div class="withdrawer-info"><div class="withdrawer-name">${w.name}</div></div><div class="withdrawer-amount">$${w.amount.toFixed(2)}</div>`;
+                const item = document.createElement('div'); 
+                item.className = 'withdrawer-item flex items-center p-3 bg-gray-700 rounded-lg';
+                item.innerHTML = `
+                    <div class="withdrawer-rank w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold text-sm">
+                        ${index + 1}
+                    </div>
+                    <div class="withdrawer-info flex-1 mx-3">
+                        <div class="withdrawer-name font-semibold text-white">${w.name}</div>
+                    </div>
+                    <div class="withdrawer-amount text-lg font-bold text-green-400">
+                        $${w.amount.toFixed(2)}
+                    </div>`;
                 topList.appendChild(item);
             });
         }
 
         function loadReferralList() {
             const listContainer = document.getElementById('referralListContainer');
-            if (!userData.referrals || userData.referrals.length === 0) { listContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No referrals yet</p>'; return; }
+            if (!userData.referrals || userData.referrals.length === 0) { listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">No referrals yet</p>'; return; }
             listContainer.innerHTML = '';
-            userData.referrals.forEach(ref => {
-                const item = document.createElement('div'); item.className = 'referral-list-item';
-                item.innerHTML = `<div><div style="font-weight: bold;">${ref.name}</div><div style="font-size: 12px; color: var(--text-secondary);">${new Date(ref.joinedAt).toLocaleDateString('en-US')}</div></div><div style="color: var(--success-color); font-weight: bold;">+$${ref.earned.toFixed(2)}</div>`;
+            [...userData.referrals].reverse().forEach(ref => { // Show latest first
+                const item = document.createElement('div'); 
+                item.className = 'referral-list-item flex justify-between items-center py-2 px-1 border-b border-gray-700';
+                item.innerHTML = `
+                    <div>
+                        <div class="font-medium text-sm text-gray-200">${ref.name}</div>
+                        <div class="text-xs text-gray-400">${new Date(ref.joinedAt).toLocaleDateString('en-US')}</div>
+                    </div>
+                    <div class="text-green-400 font-semibold text-sm">
+                        +$${ref.earned.toFixed(2)}
+                    </div>`;
                 listContainer.appendChild(item);
             });
         }
 
-        function drawEarningsChart() {
-            const canvas = document.getElementById('earningsChart');
-            if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const data = [{ label: 'Tasks', value: userData.taskEarnings || 0 }, { label: 'Games', value: userData.gameEarnings || 0 }, { label: 'Referrals', value: userData.referralEarnings || 0 }];
-            const maxValue = Math.max(...data.map(d => d.value), 1); const barWidth = canvas.width / data.length - 20;
-            const maxHeight = canvas.height - 40;
-            data.forEach((item, index) => {
-                const barHeight = (item.value / maxValue) * maxHeight; const x = index * (barWidth + 20) + 10; const y = canvas.height - barHeight - 20;
-                const gradient = ctx.createLinearGradient(0, y, 0, canvas.height); gradient.addColorStop(0, '#FF6B35'); gradient.addColorStop(1, '#F7931E'); ctx.fillStyle = gradient; ctx.fillRect(x, y, barWidth, barHeight);
-                ctx.fillStyle = '#fff'; ctx.font = '12px Arial'; ctx.textAlign = 'center'; ctx.fillText(item.label, x + barWidth / 2, canvas.height - 5); ctx.fillText(`$${item.value.toFixed(2)}`, x + barWidth / 2, y - 5);
-            });
-        }
-
-        function drawReferralChart() {
-            const canvas = document.getElementById('referralChart');
-            if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!userData.referrals || userData.referrals.length === 0) { ctx.fillStyle = '#666'; ctx.font = '14px Arial'; ctx.textAlign = 'center';
-            ctx.fillText('No referral data', canvas.width / 2, canvas.height / 2); return;
-            }
-            const referralsByDate = {};
-            userData.referrals.forEach(ref => { const date = new Date(ref.joinedAt).toLocaleDateString(); referralsByDate[date] = (referralsByDate[date] || 0) + 1; });
-            const dates = Object.keys(referralsByDate).sort((a,b) => new Date(a) - new Date(b)); const counts = dates.map(date => referralsByDate[date]);
-            const maxCount = Math.max(...counts, 1); const stepX = canvas.width / (dates.length + 1); const maxHeight = canvas.height - 40;
-            ctx.strokeStyle = '#FF6B35'; ctx.lineWidth = 3; ctx.beginPath();
-            dates.forEach((date, index) => {
-                const x = (index + 1) * stepX; const y = canvas.height - 20 - (counts[index] / maxCount) * maxHeight;
-                if (index === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
-                ctx.fillStyle = '#FF6B35'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); 
-                ctx.fill();
-            });
-            ctx.stroke();
-        }
+        // *** CHART FUNCTIONS DELETED (as profile page is deleted) ***
+        // function drawEarningsChart() { ... }
+        // function drawReferralChart() { ... }
 
         async function sendTelegramNotification(userId, message) {
             try {
@@ -2585,16 +1784,46 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
 
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+            let styles = '';
+            if (type === 'success') {
+                styles = 'bg-green-500/90 border-green-300';
+            } else if (type === 'error') {
+                styles = 'bg-red-500/90 border-red-300';
+            } else {
+                styles = 'bg-yellow-500/90 border-yellow-300';
+            }
+            
+            notification.className = `notification fixed top-5 right-5 z-[10002] p-4 rounded-lg shadow-xl text-white border-l-4 ${styles} backdrop-blur-sm`;
             notification.textContent = message;
+            notification.style.animation = 'slideInRight 0.3s ease';
             document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            
+            setTimeout(() => {
+                 notification.style.animation = 'slideOutRight 0.3s ease forwards';
+                 setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
+        
+        // Add animations to head
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = `
+            @keyframes slideInRight {
+                from { transform: translateX(110%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(110%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
 
         function closeModal() {
-            document.getElementById('taskModal').classList.remove('active');
-            document.getElementById('modalContent').innerHTML = '';
-            document.getElementById('modalActionBtn').style.display = 'block';
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            document.getElementById('modalContent').innerHTML = ''; // Clear content
+            document.getElementById('modalActionBtn').style.display = 'block'; // Reset button
         }
 
         function modalAction() {
@@ -2602,200 +1831,238 @@ if (userData && userData.dailyTasks.bonusAd.count < 15) {
             closeModal();
         }
 
-        // Initialize app on load
         // --- START: Bonus Ad Functions ---
+        function scheduleBonusAd() {
+            if (hasShownBonusAdThisSession) return; // এই সেশনে একবার দেখানো হয়েছে
 
-/**
- * ইউজার লগইন করার পর রেন্ডম টাইমে পপ-আপ দেখানোর সিডিউল করে
- */
-function scheduleBonusAd() {
-    if (hasShownBonusAdThisSession) return; // এই সেশনে একবার দেখানো হয়েছে
+            const randomTimes = [30000, 33000, 53000, 73000]; // 30s, 33s, 53s, 73s
+            const randomTime = randomTimes[Math.floor(Math.random() * randomTimes.length)];
 
-    const randomTimes = [30000, 33000, 53000, 73000]; // 30s, 33s, 53s, 73s
-    const randomTime = randomTimes[Math.floor(Math.random() * randomTimes.length)];
+            console.log(`[BonusAd] Scheduling bonus ad in ${randomTime / 1000} seconds.`);
 
-    console.log(`[BonusAd] Scheduling bonus ad in ${randomTime / 1000} seconds.`);
-
-    setTimeout(() => {
-        if (hasShownBonusAdThisSession) return; // আবার চেক করুন
-        hasShownBonusAdThisSession = true; // ফ্ল্যাগ সেট করুন
-        
-        // পপ-আপ দেখানোর আগে আবার চেক করুন দিনে ১৫ বার হয়েছে কিনা
-        if (userData && userData.dailyTasks.bonusAd.count < 15) {
-            showBonusAdPopup();
-        } else {
-            console.log("[BonusAd] Daily limit reached, not showing popup.");
+            setTimeout(() => {
+                if (hasShownBonusAdThisSession) return; // আবার চেক করুন
+                hasShownBonusAdThisSession = true; // ফ্ল্যাগ সেট করুন
+                
+                // পপ-আপ দেখানোর আগে আবার চেক করুন দিনে ১৫ বার হয়েছে কিনা
+                if (userData && (!userData.dailyTasks.bonusAd || userData.dailyTasks.bonusAd.count < 15)) {
+                    showBonusAdPopup();
+                } else {
+                    console.log("[BonusAd] Daily limit reached, not showing popup.");
+                }
+            }, randomTime);
         }
-    }, randomTime);
-}
 
-/**
- * বোনাস পপ-আপটি দেখায় এবং টাইমার চালু করে
- */
-function showBonusAdPopup() {
-    console.log("[BonusAd] Showing bonus ad popup.");
-    const modal = document.getElementById('bonusAdModal');
-    const actionBtn = document.getElementById('bonusAdModalActionBtn');
-    const contentEl = document.getElementById('bonusAdModalContent');
-    const textEl = document.getElementById('bonusAdModalText');
+        function showBonusAdPopup() {
+            console.log("[BonusAd] Showing bonus ad popup.");
+            const modal = document.getElementById('bonusAdModal');
+            const actionBtn = document.getElementById('bonusAdModalActionBtn');
+            const contentEl = document.getElementById('bonusAdModalContent');
+            const textEl = document.getElementById('bonusAdModalText');
+            const timerDisplay = contentEl.querySelector('.timer-display');
 
-    textEl.textContent = 'If you click "Watch Ad" AFTER the 12-second timer, you will get $3. If you click before, you get nothing. You must stay in the ad for 10 seconds.';
-    
-    let countdown = 12;
-    let isEligible = false; // 12 সেকেন্ড পার হলে true হবে
-    
-    contentEl.innerHTML = `<div class="timer-display">${countdown}</div>`;
-    actionBtn.textContent = `Watch Ad (Wait... ${countdown}s)`;
-    actionBtn.disabled = false; // বাটনটি ক্লিক করা যাবে
-
-    // বাটন ক্লিক করলে কী হবে তা সেট করুন
-    actionBtn.onclick = () => {
-        // ইউজার কি ১২ সেকেন্ড পর ক্লিক করেছে? (isEligible এর মান)
-        processBonusAd(isEligible);
-    };
-
-    // টাইমার ইন্টারভ্যাল ক্লিয়ার করুন (যদি আগে থেকে চালু থাকে)
-    if (bonusAdTimerInterval) clearInterval(bonusAdTimerInterval);
-
-    // নতুন টাইমার চালু করুন
-    bonusAdTimerInterval = setInterval(() => {
-        countdown--;
-        
-        if (countdown <= 0) {
-            clearInterval(bonusAdTimerInterval);
-            isEligible = true; // এখন ক্লিক করলে বোনাস পাবে
-            contentEl.innerHTML = `<div class="timer-display go">GO!</div>`; // টাইমার সবুজ করুন
-            actionBtn.textContent = 'Watch Ad ($3.00)';
-        } else {
-            contentEl.innerHTML = `<div class="timer-display">${countdown}</div>`;
-            actionBtn.textContent = `Watch Ad (Wait... ${countdown}s)`;
-        }
-    }, 1000);
-
-    // Cancel বাটন ক্লিক করলে মোডাল বন্ধ হবে এবং টাইমার থামবে
-    document.getElementById('bonusAdModalCancelBtn').onclick = () => {
-        clearInterval(bonusAdTimerInterval);
-        modal.classList.remove('active');
-        console.log("[BonusAd] User cancelled.");
-    };
-    
-    // মোডাল দেখান
-    modal.classList.add('active');
-}
-
-/**
- * ইউজার "Watch Ad" বাটনে ক্লিক করার পর এই ফাংশন কাজ করে
- * @param {boolean} isEligible - ইউজার কি ১২ সেকেন্ড পর ক্লিক করেছে?
- */
-async function processBonusAd(isEligible) {
-    // মোডাল বন্ধ করুন
-    document.getElementById('bonusAdModal').classList.remove('active');
-    clearInterval(bonusAdTimerInterval); // টাইমার থামান
-
-    // দিনে সর্বোচ্চ ১৫ বারের কাউন্টারটি আপডেট করুন
-    // বোনাস পাক বা না পাক, কাউন্ট হবে
-    try {
-        await db.collection('users').doc(userData.telegramId).update({
-            'dailyTasks.bonusAd.count': firebase.firestore.FieldValue.increment(1)
-        });
-        userData.dailyTasks.bonusAd.count++; // লোকাল ডেটা আপডেট করুন
-        console.log("[BonusAd] Daily count incremented.");
-    } catch (err) {
-        console.error("Error updating bonus ad count:", err);
-    }
-
-    // এড দেখান (Monetag Interstitial)
-    try {
-        if (typeof show_9937367 !== 'undefined') {
-            show_9937367();
-        } else {
-            throw new Error('Ad SDK not loaded');
-        }
-    } catch (error) {
-        console.error('[BonusAd] Error showing Monetag ad:', error);
-        showNotification('Error loading ad. Try again.', 'error');
-        return;
-    }
-
-    // ইউজার কি বোনাসের জন্য যোগ্য?
-    if (!isEligible) {
-        showNotification('You clicked too early. No bonus.', 'error');
-        console.log("[BonusAd] User clicked too early. No bonus.");
-        return; // এখানে শেষ
-    }
-
-    // ইউজার যোগ্য হলে (১২ সেকেন্ড পর ক্লিক করেছে)
-    showNotification('Ad is showing... wait 10 seconds for your reward!', 'warning');
-    console.log("[BonusAd] User is eligible. Waiting 10s for reward.");
-
-    // ১০ সেকেন্ড অপেক্ষা করুন (এডের ভেতরে থাকার নিয়ম)
-    setTimeout(async () => {
-        const reward = 3.00;
-        try {
-            await db.collection('users').doc(userData.telegramId).update({
-                balance: firebase.firestore.FieldValue.increment(reward),
-                taskEarnings: firebase.firestore.FieldValue.increment(reward)
-            });
-
-            // ব্যালেন্স আপডেট করার জন্য ডেটা আবার লোড করুন
-            await loadUserData();
-            updateUI(); // নতুন ব্যালেন্স স্ক্রিনে দেখান
+            textEl.textContent = 'If you click "Watch Ad" AFTER the 12-second timer, you will get $3. If you click before, you get nothing. You must stay in the ad for 10 seconds.';
             
-            showNotification(`$${reward.toFixed(2)} bonus added!`, 'success');
-            console.log("[BonusAd] $3.00 reward added.");
-        } catch (err) {
-            console.error("Error adding bonus reward:", err);
-            showNotification('Error adding bonus.', 'error');
+            let countdown = 12;
+            let isEligible = false; // 12 সেকেন্ড পার হলে true হবে
+            
+            if(timerDisplay) {
+                timerDisplay.textContent = countdown;
+                timerDisplay.classList.remove('go');
+            }
+            
+            actionBtn.textContent = `Watch Ad (Wait... ${countdown}s)`;
+            actionBtn.disabled = false; // বাটনটি ক্লিক করা যাবে
+
+            actionBtn.onclick = () => {
+                processBonusAd(isEligible);
+            };
+
+            if (bonusAdTimerInterval) clearInterval(bonusAdTimerInterval);
+
+            bonusAdTimerInterval = setInterval(() => {
+                countdown--;
+                
+                if (countdown <= 0) {
+                    clearInterval(bonusAdTimerInterval);
+                    isEligible = true; // এখন ক্লিক করলে বোনাস পাবে
+                    if(timerDisplay) {
+                        timerDisplay.textContent = 'GO!';
+                        timerDisplay.classList.add('go');
+                    }
+                    actionBtn.textContent = 'Watch Ad ($3.00)';
+                } else {
+                    if(timerDisplay) timerDisplay.textContent = countdown;
+                    actionBtn.textContent = `Watch Ad (Wait... ${countdown}s)`;
+                }
+            }, 1000);
+
+            document.getElementById('bonusAdModalCancelBtn').onclick = () => {
+                clearInterval(bonusAdTimerInterval);
+                modal.classList.remove('active');
+                console.log("[BonusAd] User cancelled.");
+            };
+            
+            modal.classList.add('active');
         }
-    }, 10000); // ১০ সেকেন্ড = 10000 মিলিসেকেন্ড
-}
-// --- END: Bonus Ad Functions ---
 
-        window.addEventListener('load', initApp);
+        async function processBonusAd(isEligible) {
+            document.getElementById('bonusAdModal').classList.remove('active');
+            clearInterval(bonusAdTimerInterval); // টাইমার থামান
+
+            try {
+                await db.collection('users').doc(userData.telegramId).update({
+                    'dailyTasks.bonusAd.count': firebase.firestore.FieldValue.increment(1)
+                });
+                userData.dailyTasks.bonusAd.count++; // লোকাল ডেটা আপডেট করুন
+                console.log("[BonusAd] Daily count incremented.");
+            } catch (err) {
+                console.error("Error updating bonus ad count:", err);
+            }
+
+            // এড দেখান (Monetag Interstitial)
+            try {
+                if (typeof show_9937367 !== 'undefined') {
+                    show_9937367();
+                } else {
+                    throw new Error('Ad SDK not loaded');
+                }
+            } catch (error) {
+                console.error('[BonusAd] Error showing Monetag ad:', error);
+                showNotification('Error loading ad. Try again.', 'error');
+                return;
+            }
+
+            if (!isEligible) {
+                showNotification('You clicked too early. No bonus.', 'error');
+                console.log("[BonusAd] User clicked too early. No bonus.");
+                return; // এখানে শেষ
+            }
+
+            showNotification('Ad is showing... wait 10 seconds for your reward!', 'warning');
+            console.log("[BonusAd] User is eligible. Waiting 10s for reward.");
+
+            setTimeout(async () => {
+                const reward = 3.00;
+                try {
+                    await db.collection('users').doc(userData.telegramId).update({
+                        balance: firebase.firestore.FieldValue.increment(reward),
+                        taskEarnings: firebase.firestore.FieldValue.increment(reward)
+                    });
+
+                    await loadUserData();
+                    updateUI(); // নতুন ব্যালেন্স স্ক্রিনে দেখান
+                    
+                    showNotification(`$${reward.toFixed(2)} bonus added!`, 'success');
+                    console.log("[BonusAd] $3.00 reward added.");
+                } catch (err) {
+                    console.error("Error adding bonus reward:", err);
+                    showNotification('Error adding bonus.', 'error');
+                }
+            }, 10000); // ১০ সেকেন্ড = 10000 মিলিসেকেন্ড
+        }
+        // --- END: Bonus Ad Functions ---
+
+        // --- START: Original VPN Check (Merged) ---
+        async function checkVPN() {
+            try {
+              const res = await fetch("https://ipapi.co/json/");
+              const data = await res.json();
+
+              if (data.security && (data.security.vpn || data.security.proxy)) {
+                showVPNWarning();
+              }
+            } catch (err) {
+              console.error("Error checking VPN:", err);
+            }
+        }
+
+        function showVPNWarning() {
+            document.getElementById("vpnWarning").style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+        // --- END: Original VPN Check (Merged) ---
+
+        window.addEventListener('load', () => {
+            initApp();
+            checkVPN(); // Run both checks
+        });
     </script>
-    <div id="vpnWarning">
-  ⚠️ VPN Detected!<br>
-  দয়া করে VPN বন্ধ করে আবার চেষ্টা করুন।
-</div>
-<script>
-  async function checkVPN() {
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-      const data = await res.json();
+    
+    <!-- *** NEW PARTICLE ANIMATION SCRIPT *** -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('particleCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-      if (data.security && (data.security.vpn || data.security.proxy)) {
-        showVPNWarning();
-      }
-    } catch (err) {
-      console.error("Error checking VPN:", err);
-    }
-  }
+            let particles = [];
+            const particleCount = 50;
 
-  function showVPNWarning() {
-    document.getElementById("vpnWarning").style.display = "block";
-    document.body.style.overflow = "hidden";
-  }
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = (Math.random() * 0.5 - 0.25); // Slow movement
+                    this.speedY = (Math.random() * 0.5 - 0.25);
+                    this.color = `rgba(${Math.random() * 50 + 100}, ${Math.random() * 50 + 150}, 255, ${Math.random() * 0.5 + 0.3})`;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
 
-  checkVPN();
-</script>
-<div class="modal" id="bonusAdModal">
-    <div class="modal-content">
-        <h3 class="modal-title" id="bonusAdModalTitle">Special Bonus!</h3>
-        <p class="modal-text" id="bonusAdModalText">Loading...</p>
-        
-        <div id="bonusAdModalContent">
-             <div class="timer-display">12</div>
-        </div>
-        
-        <div class="modal-actions">
-            <button class="btn btn-cancel" id="bonusAdModalCancelBtn">Cancel</button>
-            <button class="btn btn-primary" id="bonusAdModalActionBtn" disabled>
-                Watch Ad
-            </button>
-        </div>
-    </div>
-</div>
+                    if (this.size > 0.2) this.size -= 0.01;
 
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                    
+                    if (this.size <= 0.2) {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 2 + 1;
+                        this.speedX = (Math.random() * 0.5 - 0.25);
+                        this.speedY = (Math.random() * 0.5 - 0.25);
+                    }
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initParticles(); // Re-init on resize
+            });
+        });
+    </script>
 </body>
 </html>
+
 
